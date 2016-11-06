@@ -197,12 +197,25 @@ class TCZee(Automaton):
         curframe = inspect.currentframe()
         calframe = inspect.getouterframes(curframe, 1)
         print "\t\t[NEW DEBUG] Caller frame: ", calframe[1][3]
+
+        ''' BD: Commented my commmit code as its only a refernce during  discussions.
+
         if self.jsonConfig != {} and self.jsonConfig['category']=='time' and self.jsonConfig['state']==self.state.state and self.jsonConfig['action']==calframe[1][3]:
             # This is added only for debug purposes
             print "Sleep for state %s, category %s, parameter %d"%(self.jsonConfig['category'],
                                            self.jsonConfig['state'],
                                             self.jsonConfig['parameter'])
-            time.sleep(self.jsonConfig['parameter'])
+            time.sleep(self.jsonConfig['parameter']) '''
+        # This is a nice place also for specific packet response, 
+        # not only for time category
+        if 'category' in self.jsonConfig and self.jsonConfig['category'] == 'packet':
+            if 'state' in self.jsonConfig and self.jsonConfig['state'] == calframe[1][3]:
+                if 'parameter' in self.jsonConfig:
+                    #pkt[TCP].flags = self.jsonConfig['parameter']
+                    pkt[TCP].flags = 'R'
+                    print "\t\t[NEW DEBUG] Here we should have the packet handling test case"
+                    print pkt.summary()
+
         super(TCZee, self).send(pkt)
 
 
@@ -710,6 +723,7 @@ class Connector(Automaton):
                 tcz = TCZee(self.config, pkt, debug=3)
 
                 # Prepare only the Thread for TCZ
+                # BD: removed the threading in my current testing
                 # tczThread = Thread(target=tcz.run)
                 # tczThread.daemon = True
 
@@ -732,6 +746,15 @@ class Connector(Automaton):
                 # Starting the respective Threads
                 tczThread.start()
                 httzThread.start()
+            elif self.config['category'] == 'packet':
+                # For the moment only a TCZee is needed for the
+                # packet use case.
+                # TODO need to mix with content use cases
+                tcz = TCZee(self.config, pkt, debug=3)
+                tczThread = Thread(target=tcz.run)
+                tczThread.deamon = True
+                tczThread.start()
+                
 
             self.connections.append(tcz)
             # TODO here we create a new instance of 
