@@ -1,0 +1,10 @@
+{
+	"testID" : "Delay01",
+	"category" : "time",
+	"state" :"BEGIN",
+	"action":"BEGIN",
+	"parameter" : 6,
+	"listeningPort" : 80,
+	"listeningAddress" : "testing.com"	
+
+}

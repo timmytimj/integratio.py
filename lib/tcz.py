@@ -195,8 +195,14 @@ class TCZee(Automaton):
     # for current action and include the time delay
     def send(self, pkt):
         curframe = inspect.currentframe()
-        calframe = inspect.getouterframes(curframe, 2)
+        calframe = inspect.getouterframes(curframe, 1)
         print "\t\t[NEW DEBUG] Caller frame: ", calframe[1][3]
+        if self.jsonConfig != {} and self.jsonConfig['category']=='time' and self.jsonConfig['state']==self.state.state and self.jsonConfig['action']==calframe[1][3]:
+            # This is added only for debug purposes
+            print "Sleep for state %s, category %s, parameter %d"%(self.jsonConfig['category'],
+                                           self.jsonConfig['state'],
+                                            self.jsonConfig['parameter'])
+            time.sleep(self.jsonConfig['parameter'])
         super(TCZee, self).send(pkt)
 
 
@@ -326,12 +332,6 @@ class TCZee(Automaton):
         self.l3 = IP()/TCP()
         self.preparePkt(self.initSYN)
         self.l3[TCP].flags = 'SA'
-        if self.jsonConfig != {} and self.jsonConfig['category']=='time' and self.jsonConfig['state']=='LISTEN':
-            # This is added only for debug purposes
-            print "Sleep for state %s, category %s, parameter %d"%(self.jsonConfig['category'],
-                                           self.jsonConfig['state'],
-                                            self.jsonConfig['parameter'])
-            time.sleep(self.jsonConfig['parameter'])
         self.send(self.l3)
     
         raise  self.SYNACK_SENT()
@@ -408,12 +408,6 @@ class TCZee(Automaton):
         
         self.l3[TCP].ack += 1
         self.last_packet = self.l3
-        if self.jsonConfig != {} and self.jsonConfig['category']=='time' and self.jsonConfig['state']=='ESTABLISHED':
-            # This is added only for debug purposes
-            print "Sleep for state %s, category %s, parameter %d"%(self.jsonConfig['category'],
-                                           self.jsonConfig['state'],
-                                           self.jsonConfig['parameter'])
-            time.sleep(self.jsonConfig['parameter'])
         self.send(self.last_packet)
 
     
@@ -508,12 +502,6 @@ class TCZee(Automaton):
     def sendAck(self):
         self.l3[TCP].flags = 'A'
         self.last_packet = self.l3
-        if self.jsonConfig != {} and self.jsonConfig['category']=='time' and self.jsonConfig['state']=='ESTABLISHED':
-            # This is added only for debug purposes
-            print "Sleep for state %s, category %s, parameter %d"%(self.jsonConfig['category'],
-                                           self.jsonConfig['state'],
-                                           self.jsonConfig['parameter'])
-            time.sleep(self.jsonConfig['parameter'])
         self.send(self.last_packet)
 
     # in ESTABLISHED recv() a SYN (basically client want to start a new tcp stream)
@@ -722,11 +710,12 @@ class Connector(Automaton):
                 tcz = TCZee(self.config, pkt, debug=3)
 
                 # Prepare only the Thread for TCZ
-                tczThread = Thread(target=tcz.run)
-                tczThread.daemon = True
+                # tczThread = Thread(target=tcz.run)
+                # tczThread.daemon = True
 
                 # Starting the TCZ Threads
-                tczThread.start()
+                # tczThread.start()
+                tcz.run()
 
             elif self.config['category']=='content':
                 # Create TCZ and HTTZ Objects
