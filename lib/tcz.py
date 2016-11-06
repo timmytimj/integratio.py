@@ -197,6 +197,16 @@ class TCZee(Automaton):
         curframe = inspect.currentframe()
         calframe = inspect.getouterframes(curframe, 2)
         print "\t\t[NEW DEBUG] Caller frame: ", calframe[1][3]
+
+        # This is a nice place also for specific packet response, 
+        # not only for time category
+        if 'category' in self.jsonConfig and self.jsonConfig['category'] == 'packet':
+            if 'state' in self.jsonConfig and self.jsonConfig['state'] == calframe[1][3]:
+                if 'parameter' in self.jsonConfig:
+                    #pkt[TCP].flags = self.jsonConfig['parameter']
+                    pkt[TCP].flags = 'R'
+                    print "\t\t[NEW DEBUG] Here we should have the packet handling test case"
+                    print pkt.summary()
         super(TCZee, self).send(pkt)
 
 
@@ -743,6 +753,15 @@ class Connector(Automaton):
                 # Starting the respective Threads
                 tczThread.start()
                 httzThread.start()
+            elif self.config['category'] == 'packet':
+                # For the moment only a TCZee is needed for the
+                # packet use case.
+                # TODO need to mix with content use cases
+                tcz = TCZee(self.config, pkt, debug=3)
+                tczThread = Thread(target=tcz.run)
+                tczThread.deamon = True
+                tczThread.start()
+                
 
             self.connections.append(tcz)
             # TODO here we create a new instance of 
