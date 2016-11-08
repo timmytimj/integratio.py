@@ -65,11 +65,12 @@ from functools import wraps
 import socket
 import fcntl
 import struct
-
+import threading
 import inspect
 
 from Queue import Queue
 from threading import Thread
+
 
 
 def get_ip_address(ifname):
@@ -196,16 +197,16 @@ class TCZee(Automaton):
     def send(self, pkt):
         curframe = inspect.currentframe()
         calframe = inspect.getouterframes(curframe, 1)
-        print "\t\t[NEW DEBUG] Caller frame: ", calframe[1][3]
+        print "\t\t[NEW DEBUG] Caller frame: ", calframe[1][3]+ "-- current Thread --" + (threading.current_thread().name) + ", ID -- "+ str(threading.current_thread().ident)+"\n"
 
-        ''' BD: Commented my commmit code as its only a refernce during  discussions.
+        ''' BD: Commented my commmit code as its only a refernce during  discussions.'''
 
-        if self.jsonConfig != {} and self.jsonConfig['category']=='time' and self.jsonConfig['state']==self.state.state and self.jsonConfig['action']==calframe[1][3]:
+        if self.jsonConfig != {} and self.jsonConfig['category']=='time' and self.jsonConfig['state']==self.state.state:
             # This is added only for debug purposes
-            print "Sleep for state %s, category %s, parameter %d"%(self.jsonConfig['category'],
+            print "Sleep for state %s, category %s, parameter %d -- current Thread -- %s"%(self.jsonConfig['category'],
                                            self.jsonConfig['state'],
-                                            self.jsonConfig['parameter'])
-            time.sleep(self.jsonConfig['parameter']) '''
+                                            self.jsonConfig['parameter'], threading.current_thread().name)
+            time.sleep(self.jsonConfig['parameter'])
         # This is a nice place also for specific packet response, 
         # not only for time category
         if 'category' in self.jsonConfig and self.jsonConfig['category'] == 'packet':
@@ -213,7 +214,7 @@ class TCZee(Automaton):
                 if 'parameter' in self.jsonConfig:
                     #pkt[TCP].flags = self.jsonConfig['parameter']
                     pkt[TCP].flags = 'R'
-                    print "\t\t[NEW DEBUG] Here we should have the packet handling test case"
+                    print "\t\t[NEW DEBUG] Here we should have the packet handling test case -- current Thread --%s, ID -- %d"%(threading.current_thread().name, threading.current_thread().ident)
                     print pkt.summary()
 
         super(TCZee, self).send(pkt)
@@ -612,18 +613,18 @@ class HTTZee(object):
             exit() 
 
     def connection(self):
-        print "\t[HTTZ][connection()] Starting TCZee thread"
+        print "\t[HTTZ][connection()] Starting TCZee thread  -- current Thread --%s"%(threading.current_thread().name)
         self.tcz.run()
 
     def run(self):
             s = ""
-            print "\t[HTTZ][run()] called TCZee.run(), entering infinite loop now."
+            print "\t[HTTZ][run()] called TCZee.run(), entering infinite loop now.-- current Thread --%s"%(threading.current_thread().name)
             while ( s != "exit" ):
                 # We will need a call to recv() instead of directly
                 # accessing the TCZ Queue, but for the moment this is
                 # fine. This is a blocking call.
                 s = str( self.tcz.recv.get() )
-                print "\t[HTTZ][run()] Received data: " + s + "\n"
+                print "\t[HTTZ][run()] Received data: " + s + "-- current Thread --" + (threading.current_thread().name) +"\n"
                 self.processRequest(s)
 
     def processRequest(self, req):
@@ -638,7 +639,7 @@ class HTTZee(object):
         for p in req.split():
                         # print "\t[HTTZ] spliting request:" + p
             if (p in self.resources.keys() ):
-                print "\t[HTTZ][processRequest] Matching resource, sending response: " + self.resources[p]
+                print "\t[HTTZ][processRequest] Matching resource, sending response: " + self.resources[p]+ " -- current Thread --" + (threading.current_thread().name) +"\n"
                 self.tcz.write(self.resources[p])
                                 # Added by bdesikan on 18-Sep-16 during debug session
                                 # Temporary Patch to fix the mismatch in th Ack number 
@@ -724,7 +725,7 @@ class Connector(Automaton):
 
                 # Prepare only the Thread for TCZ
                 # BD: removed the threading in my current testing
-                # tczThread = Thread(target=tcz.run)
+                # tczThread = Thread(target=tcz.run, name='tcz_Thread_time')
                 # tczThread.daemon = True
 
                 # Starting the TCZ Threads
@@ -737,11 +738,11 @@ class Connector(Automaton):
                 httz = HTTZee(tcz)
 
                 # Prepare HTTZ Thread
-                httzThread = Thread(target=httz.run)
+                httzThread = Thread(target=httz.run, name='httz_Thread_Content')
                 httzThread.daemon = True
 
                 # Prepare a separate thread for the TCZee run
-                tczThread = Thread(target=httz.connection)
+                tczThread = Thread(target=httz.connection, name='tcz_Thread_Content')
 
                 # Starting the respective Threads
                 tczThread.start()
@@ -751,7 +752,7 @@ class Connector(Automaton):
                 # packet use case.
                 # TODO need to mix with content use cases
                 tcz = TCZee(self.config, pkt, debug=3)
-                tczThread = Thread(target=tcz.run)
+                tczThread = Thread(target=tcz.run, name='tcz_Thread_Packet')
                 tczThread.deamon = True
                 tczThread.start()
                 
