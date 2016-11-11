@@ -201,7 +201,7 @@ class TCZee(Automaton):
 
         ''' BD: Commented my commmit code as its only a refernce during  discussions.'''
 
-        if self.jsonConfig != {} and self.jsonConfig['category']=='time' and self.jsonConfig['state']==self.state.state:
+        if self.jsonConfig != {} and self.jsonConfig['category']=='time' and self.jsonConfig['state']==self.state.state and self.jsonConfig['action'] == calframe[1][3]:
             # This is added only for debug purposes
             print "Sleep for state %s, category %s, parameter %d -- current Thread -- %s"%(self.jsonConfig['category'],
                                            self.jsonConfig['state'],
@@ -340,14 +340,15 @@ class TCZee(Automaton):
 
             self.lastReceived = pkt.copy()
 
-
+#
     @ATMT.state(initial=1)
     def BEGIN(self):
+#        pass
         self.l3 = IP()/TCP()
         self.preparePkt(self.initSYN)
         self.l3[TCP].flags = 'SA'
         self.send(self.l3)
-    
+#    
         raise  self.SYNACK_SENT()
         
     @ATMT.state()
@@ -702,15 +703,15 @@ class Connector(Automaton):
 
     # BEGIN state
     @ATMT.state(initial=1)
-    def BEGIN(self):
-        raise self.LISTEN()
+    def CON_BEGIN(self):
+        raise self.CON_LISTEN()
 
     @ATMT.state()
-    def LISTEN(self):
+    def CON_LISTEN(self):
         pass
 
-    @ATMT.receive_condition(LISTEN)
-    def receive_syn(self, pkt):
+    @ATMT.receive_condition(CON_LISTEN)
+    def con_receive_syn(self, pkt):
         if('S' in flags(pkt[TCP].flags)):
             # tcz = TCZee(self.config, pkt, debug=3)
             # Check impact of DEBUG messages on performances
@@ -774,7 +775,7 @@ class Connector(Automaton):
             #    and notify Connector
 
                    
-        raise self.LISTEN()
+        raise self.CON_LISTEN()
             
             
             
