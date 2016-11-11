@@ -1,0 +1,9 @@
+{
+	"testID" : "Packet001",
+	"category" : "packet",
+	"state" :"send_finAck",
+	"parameter" : "R",
+	"listeningPort" : 80,
+	"listeningAddress" : "testing.com"	
+
+}
