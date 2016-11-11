@@ -3,7 +3,7 @@
 	"category" : "content",
 	"state" :"LISTEN",
 	"parameter" : 6,
-	"listeningPort" : 80,
+	"listeningPort" : 52413,
 	"listeningAddress" : "testing.com",
 	"listeningInterface" : "wlan0",
 	"resources" : 	[
@@ -17,11 +17,6 @@
                                         "body"          : "Response for the 500 error",
                                         "headers"       : "HTTP/1.1 500 Internal server error\r\nConnection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"
                                 },
-                {
-                                        "resource"      : "/redi",
-                                        "body"          : "",
-                                        "headers"       : "HTTP/1.1 301 Moved Permanently\r\nLocation: http://192.168.13.1/redi"
-                },
 				{
                                         "resource"      : "/404",
                                         "body"          : "Response for the 404 error",

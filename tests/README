@@ -1,0 +1,19 @@
+This folder contains a set of tests for Integratio.
+The test suite is runned automatically everytime
+a change is pushed to the 'develop' branch, to ensure
+that no regression are introduced when new feature are added.
+
+In order to run the tests, the followinf dependencies
+need to be satisfied: 
+    requests
+        Python library to support HTTP(s) request.
+
+    pytest
+        Test framework for Python 
+
+Installation (internet connection required):
+
+    $ pip install requests
+    $ pip install -U pytest
+
+The tests in this folder are acting as Integration Product Client.
