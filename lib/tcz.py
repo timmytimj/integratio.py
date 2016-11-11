@@ -383,11 +383,6 @@ class TCZee(Automaton):
         self.preparePkt(self.initSYN)
         self.l3[TCP].flags = 'SA'
         self.send(self.l3)
-<<<<<<< HEAD
-#    
-=======
-
->>>>>>> develop
         raise  self.SYNACK_SENT()
 
     @ATMT.state()
@@ -666,27 +661,15 @@ class HTTZee(object):
         self.tcz.run()
 
     def run(self):
-<<<<<<< HEAD
-            s = ""
-            print "\t[HTTZ][run()] called TCZee.run(), entering infinite loop now.-- current Thread --%s"%(threading.current_thread().name)
-            while ( s != "exit" ):
-                # We will need a call to recv() instead of directly
-                # accessing the TCZ Queue, but for the moment this is
-                # fine. This is a blocking call.
-                s = str( self.tcz.recv.get() )
-                print "\t[HTTZ][run()] Received data: " + s + "-- current Thread --" + (threading.current_thread().name) +"\n"
-                self.processRequest(s)
-=======
         s = ""
-        print "\t[HTTZ][run()] called TCZee.run(), entering infinite loop now."
+        print "\t[HTTZ][run()] called TCZee.run(), entering infinite loop now.-- current Thread --%s"%(threading.current_thread().name)
         while ( s != "exit" ):
-                # We will need a call to recv() instead of directly
-                # accessing the TCZ Queue, but for the moment this is
-                # fine. This is a blocking call.
+            # We will need a call to recv() instead of directly
+            # accessing the TCZ Queue, but for the moment this is
+            # fine. This is a blocking call.
             s = str( self.tcz.recv.get() )
-            print "\t[HTTZ][run()] Received data: " + s + "\n"
+            print "\t[HTTZ][run()] Received data: " + s + "-- current Thread --" + (threading.current_thread().name) +"\n"
             self.processRequest(s)
->>>>>>> develop
 
     def processRequest(self, req):
         # TODO  Here we will need the logic to parse the whole HTTP request
@@ -834,13 +817,4 @@ class Connector(Automaton):
             # 4. When connection is closed, HTTZ Thread should die
             #    and notify Connector
 
-<<<<<<< HEAD
-                   
         raise self.CON_LISTEN()
-            
-            
-            
-=======
-
-        raise self.LISTEN()
->>>>>>> develop
