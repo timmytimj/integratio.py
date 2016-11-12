@@ -18,4 +18,14 @@ Installation (internet connection required):
 
 The tests in this folder are acting as Integration Product Client.
 
+<<<<<<< HEAD
 
+=======
+Additional notes on automating the test
+
+    - Sinatra is a ruby library to create really simple web-server scripts
+
+    - ngrok is a simple solution to create tunneling to local servers.
+      Meaning that it can provide a public URL that tunnels to a server
+      on your local, NATted machine
+>>>>>>> b15de4f07762229d362af6e85e2d053f1727605b
