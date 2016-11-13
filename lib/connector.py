@@ -67,7 +67,7 @@ class Connector(Automaton):
     def BEGIN(self):
         # DNZee component for DNS look-up from browser 
         # DNS is using UDP-only implementation for the time-being.
-        dnz = DNZee(debug=3)
+        dnz = DNZee(self.config, debug=3)
         dnzThread = Thread(target=dnz.run, name='DNS_Thread')
         dnzThread.daemon = True
         # Starting the TCZ Threads
