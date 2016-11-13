@@ -27,7 +27,7 @@ class Connector(Automaton):
             self.localPort = int( jsonConfig['listeningPort'] )
         else:
             self.localPort = 80
-        
+
         # TODO This is duplicate code, we can keep it only in the connector
         # and reference the local ip inform from the Connector in TCZee
         if 'listeningInterface' in self.config:
@@ -38,7 +38,7 @@ class Connector(Automaton):
         # We are assuming here that IntegratioWebServer is listening on wlan0 interface
         try:
             # TODO  This step define on which interface (and so IP address) the TCZ will listen
-            #       to. Should not be hardcoded but should be part of the JSON configuration  
+            #       to. Should not be hardcoded but should be part of the JSON configuration
             self.localAddr = get_ip_address(self.interface)
             #self.myIp = 0
             print "MyIP address: " + str(self.localAddr)
@@ -49,7 +49,7 @@ class Connector(Automaton):
             pass
 
         self.connections = []
-                
+
     # check only matching incoming packets
     def master_filter(self, pkt):
         if (self.localAddr != 0):
@@ -64,7 +64,7 @@ class Connector(Automaton):
 
     # BEGIN state
     @ATMT.state(initial=1)
-    def BEGIN(self):
+    def CON_BEGIN(self):
         # DNZee component for DNS look-up from browser 
         # DNS is using UDP-only implementation for the time-being.
         dnz = DNZee(self.config, debug=3)
@@ -72,19 +72,19 @@ class Connector(Automaton):
         dnzThread.daemon = True
         # Starting the TCZ Threads
         dnzThread.start()
-        raise self.LISTEN()
+        raise self.CON_LISTEN()
 
     @ATMT.state()
-    def LISTEN(self):
+    def CON_LISTEN(self):
         pass
 
-    @ATMT.receive_condition(LISTEN)
-    def receive_syn(self, pkt):
+    @ATMT.receive_condition(CON_LISTEN)
+    def con_receive_syn(self, pkt):
         if('S' in flags(pkt[TCP].flags)):
             # tcz = TCZee(self.config, pkt, debug=3)
             # Check impact of DEBUG messages on performances
 
-            # BD: issue#17: For creating a dummy Httz for time category 
+            # BD: issue#17: For creating a dummy Httz for time category
             # cases. status_http parameter is passed to HTTZee class.
             # status_http = 0 means dummy httz component used for time.
             # status_http = 1 means proper httz component used for content.
@@ -99,7 +99,6 @@ class Connector(Automaton):
 
                 # Starting the TCZ Threads
                 tczThread.start()
-                #tcz.run()
 
             elif self.config['category']=='content':
                 # Create TCZ and HTTZ Objects
@@ -127,7 +126,7 @@ class Connector(Automaton):
                 
 
             self.connections.append(tcz)
-            # TODO here we create a new instance of 
+            # TODO here we create a new instance of
             # HTTZee (that contains a TCZee).
             #
             # 1. TCZee need to start from SYN_ACK sent state
@@ -136,11 +135,10 @@ class Connector(Automaton):
             #    only packet that belongs to his connection
             #
             # 3. Connector needs to keep track of current open
-            #    connections and avoid create new Thread for 
+            #    connections and avoid create new Thread for
             #    re-transmitted packets.
             #
             # 4. When connection is closed, HTTZ Thread should die
             #    and notify Connector
 
-                   
-        raise self.LISTEN()
+        raise self.CON_LISTEN()
