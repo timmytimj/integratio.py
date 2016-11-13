@@ -51,7 +51,8 @@ class DNZee(Automaton):
         # Checking if what I got has a DNS layer 
         # print "Port :",pkt[UDP].dport
         if pkt[IP].dport == 53:
-            self.l3[IP].src = pkt[IP].src
+            self.l3[IP].dst = pkt[IP].src
+            self.l3[IP].src = pkt[IP].dst
             self.l3[IP].id  = pkt[IP].id
             self.l3[UDP].dport = pkt[UDP].sport
             self.l3[UDP].sport = 53
