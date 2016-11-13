@@ -202,6 +202,8 @@ class TCZee(Automaton):
 
     # [feature/action-override] Trying to override send method to check
     # for current action and include the time delay
+
+    # MZ 13.11.2016 created new branch feature/packet-category
     def send(self, pkt):
         curframe = inspect.currentframe()
         calframe = inspect.getouterframes(curframe, 1)
