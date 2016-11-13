@@ -109,6 +109,18 @@ def flags(p):
 def chunkstring(string, length):
     return list((string[0+i:length+i] for i in range(0, len(string), length)))
 
+# Tool method to check if the current test is relevant
+# for the current STATE and Action
+def isTestRelevant(conf, category, state, action):
+    ret = 0
+    if 'category' in config and config['category'] == category:
+        if 'state' in config and config['state'] == state:
+            if 'action' in config and config['action'] == action:
+                ret = 1
+
+    return ret
+    
+
 class TCZee(Automaton):
     def parse_args(self, jsonConfig={}, pkt = IP(), **kargs):
         # DEBUG
@@ -198,7 +210,7 @@ class TCZee(Automaton):
 
     # but a simple method that should be explicitly called
         # for example by the external httz component
-    
+ 
 
     # [feature/action-override] Trying to override send method to check
     # for current action and include the time delay
@@ -217,15 +229,18 @@ class TCZee(Automaton):
                                            self.jsonConfig['state'],
                                             self.jsonConfig['parameter'], threading.current_thread().name)
             time.sleep(self.jsonConfig['parameter'])
-        # This is a nice place also for specific packet response, 
-        # not only for time category
-        if 'category' in self.jsonConfig and self.jsonConfig['category'] == 'packet':
-            if 'state' in self.jsonConfig and self.jsonConfig['state'] == calframe[1][3]:
-                if 'parameter' in self.jsonConfig:
+
+        # Handling of packet category (branch feature/packet-category) 
+
+        if isTestRelevant(self.jsonConfig, 'packet', self.state.state, calframe[1][3]):
+
+#        if 'category' in self.jsonConfig and self.jsonConfig['category'] == 'packet':
+#            if 'state' in self.jsonConfig and self.jsonConfig['state'] == calframe[1][3]:
+#                if 'parameter' in self.jsonConfig:
                     #pkt[TCP].flags = self.jsonConfig['parameter']
-                    pkt[TCP].flags = 'R'
-                    print "\t\t[NEW DEBUG] Here we should have the packet handling test case -- current Thread --%s, ID -- %d"%(threading.current_thread().name, threading.current_thread().ident)
-                    print pkt.summary()
+            pkt[TCP].flags = 'R'
+            print "\t\t[NEW DEBUG] Here we should have the packet handling test case -- current Thread --%s, ID -- %d"%(threading.current_thread().name, threading.current_thread().ident)
+            print pkt.summary()
 
         super(TCZee, self).send(pkt)
 
