@@ -1,7 +1,5 @@
 from scapy.all import *
-from lib.tcz import TCZee
-from lib.tcz import HTTZee
-from lib.tcz import Connector
+from lib.connector import Connector
 from scapy.all import Automaton
 from functools import wraps
 
