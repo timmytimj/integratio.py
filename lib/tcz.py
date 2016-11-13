@@ -772,12 +772,11 @@ class Connector(Automaton):
 
                 # Prepare only the Thread for TCZ
                 # BD: removed the threading in my current testing
-                # tczThread = Thread(target=tcz.run, name='tcz_Thread_time')
-                # tczThread.daemon = True
+                tczThread = Thread(target=tcz.run, name='tcz_Thread_time')
+                tczThread.daemon = True
 
                 # Starting the TCZ Threads
-                # tczThread.start()
-                tcz.run()
+                tczThread.start()
 
             elif self.config['category']=='content':
                 # Create TCZ and HTTZ Objects
