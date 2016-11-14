@@ -23,6 +23,13 @@ def get_ip_address(ifname):
 
 # With the stunnel configuration, we need again the possibility
 # to work on the loopback interface
+
+# TODO !!! Attention !!! 
+# If we use the L3RawSocket, the whole thing works on the local interface,
+# but we get an ERROR 1 Operation Not Permitted error when we try to send a 
+# RST on an active TCP connection ('packet' category configuration)
+# Being able to work on the local interface is useful for the pytest, 
+# (maybe) mandatory in case we use stunnel
 conf.L3socket = L3RawSocket
 
 # return a list of flag 'chars' given an int
@@ -43,3 +50,15 @@ def flags(p):
 # The last chunk might be smaller than chunk size.
 def chunkstring(string, length):
     return list((string[0+i:length+i] for i in range(0, len(string), length)))
+
+# Tool method to check if the current test is relevant
+# for the current STATE and Action
+def isTestRelevant(config, category, state, action):
+    ret = False
+    if 'category' in config and config['category'] == category:
+        if 'state' in config and config['state'] == state:
+            if 'action' in config and config['action'] == action:
+                ret = True
+
+    return ret
+

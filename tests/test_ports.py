@@ -1,7 +1,8 @@
-# content of test_delay.py
+# content of test_ports.py
 
 import sys
 sys.path.append('../lib')
+import tcz 
 import requests
 import pytest
 import io
@@ -10,15 +11,14 @@ import time
 import socket
 from connector import Connector
 
-config = { \
-    "testID" : "Delay02", \
-    "category" : "time", \
-    "state" :"BEGIN", \
-    "action":"BEGIN",\
-    "parameter" : 3, \
-    "listeningPort" : 80, \
-    "listeningAddress" : "testing.com", \
-    "listeningInterface" : "wlan0" \
+config = {\
+    "testID" : "Delay01",\
+    "category" : "time",\
+    "state" :"LISTEN",\
+    "parameter" : 6,\
+    "listeningPort" : 52413,\
+    "listeningAddress" : "testing.com",\
+    "listeningInterface" : "wlan0"\
 }
 
 
@@ -39,23 +39,25 @@ def connect_ex( time = 3, server_address = ('192.168.13.1', 80) ):
 @pytest.fixture
 def runConnector():
     # Starting the Connector thread
-#    fileConfig = io.open('../configs/delay.json')
+#    fileConfig = io.open('../configs/delay_52413.json')
 #    config = json.load(fileConfig)
     con = Connector(config, debug=3)
     con.runbg()
-    yield  con
+    yield con
     con.stop()
 
-# TCZ will wait 3 seconds before reply to SYN.
-# connect has a timeout of 1 in this test case.
-# TEST PASS if the connect(1) raise the Timeout
-# exception 
+# This test pass if connection is succesfull 
+# on the specific port
+def test_port_ok(runConnector):
+    assert connect_ex(2, ('192.168.13.1', 52413)) == 0
+    
 
-def test_delay1(runConnector):
-    with pytest.raises(socket.timeout):
-        connect(2)
+# This test pass is the connection on
+# port 80 fails (because the json config
+# is set to listen on 52413
+def test_port_connFails(runConnector):
+    assert connect_ex(2) != 0
 
-# In this case, the connection should happen 
-# correctly
-def test_delay2(runConnector):
-    assert connect_ex(5) == 0
+
+
+
