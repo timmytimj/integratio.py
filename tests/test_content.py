@@ -10,11 +10,46 @@ import io
 import json
 import time
 
+
+config = {
+    "testID" : "Content test case 1",\
+    "category" : "content",\
+    "state" :"LISTEN",\
+    "parameter" : 6,\
+    "listeningPort" : 80,\
+    "listeningAddress" : "testing.com",\
+    "listeningInterface" : "wlan0",\
+    "resources" :   [\
+                {\
+                    "resource"  : "/",\
+                    "body"      : "Response for the main resource /",\
+                    "headers"   : "HTTP/1.1 200 OK\r\nConnection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
+                },\
+                {\
+                                        "resource"      : "/500",\
+                                        "body"          : "Response for the 500 error",\
+                                        "headers"       : "HTTP/1.1 500 Internal server error\r\nConnection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
+                                },\
+                {\
+                                        "resource"      : "/404",\
+                                        "body"          : "Response for the 404 error",\
+                                        "headers"       : "HTTP/1.1 404 Resource not found\r\nConnection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
+                                },\
+                {\
+                                        "resource"      : "/favicon.ico",\
+                                        "body"      : "FavICO",\
+                    "headers"       : "HTTP/1.1 200 OK\r\nConnection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
+                                }\
+            ]\
+}
+
+
+
 @pytest.fixture
 def makeRequest500():
     # Starting the Connector thread
-    fileConfig = io.open('../configs/content.json')
-    config = json.load(fileConfig)
+#    fileConfig = io.open('../configs/content.json')
+#    config = json.load(fileConfig)
     con = Connector(config, debug=3)
     con.runbg()
 
@@ -27,8 +62,8 @@ def makeRequest500():
 @pytest.fixture
 def makeRequest404():
     # Starting the Connector thread
-    fileConfig = io.open('../configs/content.json')
-    config = json.load(fileConfig)
+#    fileConfig = io.open('../configs/content.json')
+#    config = json.load(fileConfig)
     con = Connector(config, debug=3)
     con.runbg()
 
