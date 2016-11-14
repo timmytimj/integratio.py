@@ -175,20 +175,18 @@ class TCZee(Automaton):
 
         ''' BD: Commented my commmit code as its only a refernce during  discussions.'''
 
-        if self.jsonConfig != {} and self.jsonConfig['category']=='time' and self.jsonConfig['state']==self.state.state and self.jsonConfig['action'] == calframe[1][3]:
+        if isTestRelevant(self.jsonConfig, 'time', self.state.state, calframe[1][3]):
             # This is added only for debug purposes
-            print "Sleep for state %s, category %s, parameter %d -- current Thread -- %s"%(self.jsonConfig['category'],
-                                           self.jsonConfig['state'],
-                                            self.jsonConfig['parameter'], threading.current_thread().name)
+            print "Sleep for state %s, category %s, parameter %d -- current Thread -- %s"%(self.jsonConfig['category'], \
+                    self.jsonConfig['state'], \
+                    self.jsonConfig['parameter'], threading.current_thread().name)
             time.sleep(self.jsonConfig['parameter'])
         # This is a nice place also for specific packet response, 
         # not only for time category
-        if 'category' in self.jsonConfig and self.jsonConfig['category'] == 'packet':
-            if 'state' in self.jsonConfig and self.jsonConfig['state'] == calframe[1][3]:
-                if 'parameter' in self.jsonConfig:
-                    #pkt[TCP].flags = self.jsonConfig['parameter']
+        if isTestRelevant(self.jsonConfig, 'packet', self.state.state, calframe[1][3]):
                     pkt[TCP].flags = 'R'
-                    print "\t\t[NEW DEBUG] Here we should have the packet handling test case -- current Thread --%s, ID -- %d"%(threading.current_thread().name, threading.current_thread().ident)
+                    print "\t\t[NEW DEBUG] Here we should have the packet handling test case -- current Thread --%s, ID -- %d" \
+                        %(threading.current_thread().name, threading.current_thread().ident)
                     print pkt.summary()
 
         super(TCZee, self).send(pkt)
