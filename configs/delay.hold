@@ -1,9 +1,0 @@
-{
-	"testID" : "Delay01",
-	"category" : "time",
-	"state" :"LISTEN",
-	"parameter" : 6,
-	"listeningPort" : 80,
-	"listeningAddress" : "testing.com",	
-	"listeningInterface" : "wlan0"
-}

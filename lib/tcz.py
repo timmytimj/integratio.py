@@ -88,7 +88,7 @@ def get_ip_address(ifname):
 
 # With the stunnel configuration, we need again the possibility
 # to work on the loopback interface
-conf.L3socket = L3RawSocket
+# conf.L3socket = L3RawSocket
 
 # return a list of flag 'chars' given an int
 # (p[TCP].flags)
@@ -111,7 +111,7 @@ def chunkstring(string, length):
 
 # Tool method to check if the current test is relevant
 # for the current STATE and Action
-def isTestRelevant(conf, category, state, action):
+def isTestRelevant(config, category, state, action):
     ret = 0
     if 'category' in config and config['category'] == category:
         if 'state' in config and config['state'] == state:
@@ -238,9 +238,10 @@ class TCZee(Automaton):
 #            if 'state' in self.jsonConfig and self.jsonConfig['state'] == calframe[1][3]:
 #                if 'parameter' in self.jsonConfig:
                     #pkt[TCP].flags = self.jsonConfig['parameter']
-            pkt[TCP].flags = 'R'
-            print "\t\t[NEW DEBUG] Here we should have the packet handling test case -- current Thread --%s, ID -- %d"%(threading.current_thread().name, threading.current_thread().ident)
+            pkt[TCP].flags = str( self.jsonConfig['parameter'] )
+            print "\t\t[NEW DEBUG] packet handling test case -- current Thread --%s, ID -- %d"%(threading.current_thread().name, threading.current_thread().ident)
             print pkt.summary()
+            print "Src port: " +  str(pkt[TCP].sport) + ". Dst port: " + str(pkt[TCP].dport)
 
         super(TCZee, self).send(pkt)
 
@@ -786,12 +787,12 @@ class Connector(Automaton):
 
                 # Prepare only the Thread for TCZ
                 # BD: removed the threading in my current testing
-                # tczThread = Thread(target=tcz.run, name='tcz_Thread_time')
-                # tczThread.daemon = True
+                tczThread = Thread(target=tcz.run, name='tcz_Thread_time')
+                tczThread.daemon = True
 
                 # Starting the TCZ Threads
-                # tczThread.start()
-                tcz.run()
+                tczThread.start()
+                #tcz.run()
 
             elif self.config['category']=='content':
                 # Create TCZ and HTTZ Objects

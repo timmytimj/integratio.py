@@ -1,9 +1,11 @@
 {
 	"testID" : "Packet001",
 	"category" : "packet",
-	"state" :"send_finAck",
+	"state" :"ESTABLISHED",
+    "action" : "sendAck",
 	"parameter" : "R",
 	"listeningPort" : 80,
-	"listeningAddress" : "testing.com"	
+	"listeningAddress" : "testing.com",	
+    "listeningInterface" : "eth0"
 
 }
