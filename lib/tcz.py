@@ -51,7 +51,10 @@
 #
 #   Also, remember to block RST packet from the server machine with the following iptable rule
 #
-#   iptables -A OUTPUT -p tcp --tcp-flags RST RST -j DROP
+#   NOTE    This rule will check both RST and PSH flags, and drop only the RST=1 and PSH=0
+#           In this way, we can block the RST from kernel, but let the RST PSH from test cases
+#
+#   iptables -A OUTPUT -p tcp --tcp-flags RST,PSH RST -j DROP
 #
 #
 #

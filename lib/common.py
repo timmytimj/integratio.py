@@ -17,25 +17,14 @@ def get_ip_address(ifname):
         struct.pack('256s', ifname[:15])
     )[20:24])
 
-# get_ip_address('eth0')
-# '38.113.228.130'
-
-
-# With the stunnel configuration, we need again the possibility
-# to work on the loopback interface
-
-# TODO !!! Attention !!! 
-# If we use the L3RawSocket, the whole thing works on the local interface,
-# but we get an ERROR 1 Operation Not Permitted error when we try to send a 
-# RST on an active TCP connection ('packet' category configuration)
-# Being able to work on the local interface is useful for the pytest, 
-# (maybe) mandatory in case we use stunnel
-
+# Use RawSocket to make it work on local interface to.
+#
+# NOTE  Raw Socket usage was giving a problem with Operation not permitted
+#       but that was actually due to the iptables rules to block RST.
+#       This has been fixed by changing the iptable rule.
+#       Still would be interesting to understand how using PacketSocket
+#       the iptable rules did not apply.
 conf.L3socket = L3RawSocket
-# L3PacketSocket is the default (if we do not explicitly assign anything)
-#conf.L3socket = L3PacketSocket
-#conf.L3socket = L3dnetSocket
-#conf.L3socket = SimpleSocket
 
 # return a list of flag 'chars' given an int
 # (p[TCP].flags)
