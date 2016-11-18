@@ -3,6 +3,7 @@ from common import *
 from tcz import TCZee
 from httz import HTTZee
 from dnz import DNZee
+from icmz import ICMZee
 import time
 import sys
 import signal
@@ -97,6 +98,14 @@ class Connector(Automaton):
         dnzThread.daemon = True
         # Starting the TCZ Threads
         dnzThread.start()
+
+        # ICMP component for icmp scenarios
+        icmz = ICMZee(self.config, debug=3)
+        icmzThread = Thread(target=icmz.run, name='ICMP_Thread')
+        icmzThread.daemon = True
+        # Starting the TCZ Threads
+        icmzThread.start()
+        
         raise self.CON_LISTEN()
 
     @ATMT.state()
