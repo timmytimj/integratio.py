@@ -185,10 +185,10 @@ class TCZee(Automaton):
         # This is a nice place also for specific packet response, 
         # not only for time category
         if isTestRelevant(self.jsonConfig, 'packet', self.state.state, calframe[1][3]):
-                    pkt[TCP].flags = 'R'
+                    pkt[TCP].flags = self.jsonConfig['parameter']
                     print "\t\t[NEW DEBUG] Here we should have the packet handling test case -- current Thread --%s, ID -- %d" \
                         %(threading.current_thread().name, threading.current_thread().ident)
-                    print pkt.summary()
+                    #print pkt.show2()
 
         super(TCZee, self).send(pkt)
 
@@ -365,12 +365,14 @@ class TCZee(Automaton):
     # I go back to BEGIN (send again the SYN)
     # TODO this might be a good place to implement a retransmission logic,
     # for the moment it just keep tryin
-    @ATMT.timeout(SYNACK_SENT, 4)
-    def timeoutSynAckSent(self):
-
-        self.curAck = 0
-        self.curSeq = 0
-        raise self.BEGIN()
+    # NOTE  This does not apply anymore, because we do not start TCZ by itself anymore
+    #       only triggered by the Connector
+    #@ATMT.timeout(SYNACK_SENT, 4)
+    #def timeoutSynAckSent(self):
+#
+ #       self.curAck = 0
+  #      self.curSeq = 0
+   #     raise self.BEGIN()
 
     @ATMT.state()
     def ESTABLISHED(self):

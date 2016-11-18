@@ -30,7 +30,12 @@ def get_ip_address(ifname):
 # RST on an active TCP connection ('packet' category configuration)
 # Being able to work on the local interface is useful for the pytest, 
 # (maybe) mandatory in case we use stunnel
+
 conf.L3socket = L3RawSocket
+# L3PacketSocket is the default (if we do not explicitly assign anything)
+#conf.L3socket = L3PacketSocket
+#conf.L3socket = L3dnetSocket
+#conf.L3socket = SimpleSocket
 
 # return a list of flag 'chars' given an int
 # (p[TCP].flags)

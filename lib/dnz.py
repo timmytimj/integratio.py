@@ -36,17 +36,17 @@ class DNZee(Automaton):
 
     # BEGIN
     @ATMT.state(initial=1)
-    def BEGIN(self):
+    def DNZ_BEGIN(self):
         self.l3 = IP()/UDP()/DNS()
         #self.lastHttpRequest = ""
-        raise  self.LISTEN()
+        raise  self.DNZ_LISTEN()
     
     # LISTEN
     @ATMT.state()
-    def LISTEN(self):
+    def DNZ_LISTEN(self):
         pass
 
-    @ATMT.receive_condition(LISTEN)
+    @ATMT.receive_condition(DNZ_LISTEN)
     def check_query(self, pkt):
         # Checking if what I got has a DNS layer 
         # print "Port :",pkt[UDP].dport
@@ -70,7 +70,7 @@ class DNZee(Automaton):
                 self.l3[DNS].ancount = 0
                 self.l3[DNS].an = None
                 self.l3[DNS].rcode = "name-error"
-        raise self.LISTEN()
+        raise self.DNZ_LISTEN()
 
     @ATMT.action(check_query)
     def send_answer(self):

@@ -21,7 +21,7 @@ class Connector(Automaton):
     def parse_args(self, jsonConfig={}, **kargs):
         Automaton.parse_args(self, **kargs)
         self.config = jsonConfig
-
+        self.lastReceived = ""
         # set listening port
         if 'listeningPort' in jsonConfig:
             self.localPort = int( jsonConfig['listeningPort'] )
@@ -61,6 +61,31 @@ class Connector(Automaton):
             return  ( IP in pkt and TCP in pkt \
                     and pkt[TCP].dport == self.localPort
                     )
+    
+    # This is a tool method used to recognized if 'pkt'
+    # is a retransmitted packet or not.
+    # This will be useful when we will implement different retransmission policies
+    # for the moment we use to avoid increasing self.ack when we received a retransmitted packet
+    def isRetransmit(self, pkt):
+        if (self.lastReceived == ""):
+            return False
+        
+        if(Padding in pkt):
+            pkt[Padding] = None
+        if(Padding in self.lastReceived):
+            self.lastReceived[Padding] = None
+
+        else:
+            if(
+                (self.lastReceived[TCP].ack == pkt[TCP].ack) and \
+                (self.lastReceived[TCP].seq == pkt[TCP].seq) and \
+                (self.lastReceived[TCP].payload == pkt[TCP].payload)
+            ):
+                return True
+            else:
+                return False
+
+
 
     # BEGIN state
     @ATMT.state(initial=1)
@@ -80,7 +105,8 @@ class Connector(Automaton):
 
     @ATMT.receive_condition(CON_LISTEN)
     def con_receive_syn(self, pkt):
-        if('S' in flags(pkt[TCP].flags)):
+        
+        if( 'S' in flags(pkt[TCP].flags) and not self.isRetransmit(pkt) ):
             # tcz = TCZee(self.config, pkt, debug=3)
             # Check impact of DEBUG messages on performances
 
@@ -124,7 +150,7 @@ class Connector(Automaton):
                 tczThread.deamon = True
                 tczThread.start()
                 
-
+            self.lastReceived = pkt
             self.connections.append(tcz)
             # TODO here we create a new instance of
             # HTTZee (that contains a TCZee).
