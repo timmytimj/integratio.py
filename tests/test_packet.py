@@ -51,7 +51,7 @@ def runConnectorRefused():
 def runConnectorAborted():
     confi['state'] = 'BEGIN'
     confi['action'] = 'BEGIN'
-    confi['parameter'] = 'RST'
+    confi['parameter'] = 'R'
     con = Connector(confi, debug=3)
     con.runbg()
     yield  con
@@ -85,7 +85,7 @@ def test_packet_3(runConnectorAborted):
     try:
         send()
     except socket.error, v:
-        #import pdb; pdb.set_trace()
+        import pdb; pdb.set_trace()
         errorcode = v[0]
         assert errorcode == errno.ECONNABORTED
 
