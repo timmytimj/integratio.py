@@ -1,8 +1,9 @@
 # content of test_delay.py
 
 import sys
-sys.path.append('../lib')
+sys.path.append('../libs')
 from connector import Connector
+from get_my_IPaddress import get_my_IPaddress
 import requests
 import pytest
 import io
@@ -51,8 +52,9 @@ def makeRequest500():
     con = Connector(config, debug=3)
     con.runbg()
 
+    my_IPaddress = "http://%s" % (get_my_IPaddress('wlan0'))
 
-    r = requests.get('http://192.168.13.1/500', timeout=2)
+    r = requests.get(my_IPaddress + '/500', timeout=5)
     yield r
     r.close()
     con.stop()
@@ -65,8 +67,9 @@ def makeRequest404():
     con = Connector(config, debug=3)
     con.runbg()
 
+    my_IPaddress = "http://%s" % (get_my_IPaddress('wlan0'))
 
-    r = requests.get('http://192.168.13.1/404', timeout=2)
+    r = requests.get(my_IPaddress + '/404', timeout=5)
     yield r
     r.close()
     con.stop()

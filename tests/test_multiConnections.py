@@ -1,8 +1,9 @@
 # content of test_delay.py
 
 import sys
-sys.path.append('../lib')
+sys.path.append('../libs')
 from connector import Connector
+from get_my_IPaddress import get_my_IPaddress
 import requests
 import pytest
 import io
@@ -51,10 +52,12 @@ def makeRequestMultiConnections():
     con = Connector(config, debug=3)
     con.runbg()
 
+    my_IPaddress = "http://%s" % (get_my_IPaddress('wlan0'))
+
     # creating MULTIPLE requests
-    r1 = requests.get('http://192.168.0.241/500', timeout=2)
-    r2 = requests.get('http://192.168.0.241/404', timeout=2)
-    r3 = requests.get('http://192.168.0.241/favicon.ico', timeout=2)
+    r1 = requests.get(my_IPaddress + '/500', timeout=2)
+    r2 = requests.get(my_IPaddress + '/404', timeout=2)
+    r3 = requests.get(my_IPaddress + '/favicon.ico', timeout=2)
     yield r1, r2, r3
     r1.close()
     r2.close()

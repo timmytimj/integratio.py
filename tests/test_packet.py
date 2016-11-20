@@ -1,14 +1,15 @@
 # content of test_packet.py
 
 import sys
-sys.path.append('../lib')
+sys.path.append('../libs')
+from connector import Connector
+from get_my_IPaddress import get_my_IPaddress
 import requests
 import pytest
 import io
 import json
 import time
 import socket
-from connector import Connector
 import errno
 
 confi = {
@@ -22,7 +23,9 @@ confi = {
     "listeningInterface" : "eth0"
 }
 
-def send( server_address = ('192.168.0.241', 80) ):
+my_IPaddress = get_my_IPaddress('eth0')
+
+def send( server_address = (my_IPaddress, 80) ):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.settimeout(5)
     sock.connect(server_address)
@@ -85,7 +88,7 @@ def test_packet_3(runConnectorAborted):
     try:
         send()
     except socket.error, v:
-        import pdb; pdb.set_trace()
+        #import pdb; pdb.set_trace()
         errorcode = v[0]
         assert errorcode == errno.ECONNABORTED
 

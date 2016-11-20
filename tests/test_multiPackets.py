@@ -1,8 +1,9 @@
 # content of test_delay.py
 
 import sys
-sys.path.append('../lib')
+sys.path.append('../libs')
 from connector import Connector
+from get_my_IPaddress import get_my_IPaddress
 import requests
 import pytest
 import time
@@ -49,7 +50,9 @@ def makeRequestMultiPacket():
     con = Connector(config, debug=3)
     con.runbg()
 
-    r = requests.get('http://192.168.0.241/favicon.ico', timeout=5)
+    my_IPaddress = "http://%s" % (get_my_IPaddress('wlan0'))
+
+    r = requests.get(my_IPaddress + '/favicon.ico', timeout=5)
 
     time.sleep(20) # is it needed ???
     yield r.text

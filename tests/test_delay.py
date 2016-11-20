@@ -1,7 +1,9 @@
 # content of test_delay.py
 
 import sys
-sys.path.append('../lib')
+sys.path.append('../libs')
+from connector import Connector
+from get_my_IPaddress import get_my_IPaddress
 import requests
 import pytest
 import io
@@ -9,7 +11,7 @@ import json
 import time
 import socket
 import errno
-from connector import Connector
+
 
 config = { \
     "testID" : "Delay02", \
@@ -22,15 +24,16 @@ config = { \
     "listeningInterface" : "lo" \
 }
 
+my_IPaddress = get_my_IPaddress('lo')
 
-def connect( time = 3, server_address = ('127.0.0.1', 80) ):
+def connect( time = 3, server_address = (my_IPaddress, 80) ):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.settimeout(time)
     sock.connect(server_address)
 
 # Same as connect(), just return an error code instead of 
 # raising an exception if the connection fails
-def connect_ex( time = 3, server_address = ('127.0.0.1', 80) ):
+def connect_ex( time = 3, server_address = (my_IPaddress, 80) ):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.settimeout(time)
     return sock.connect_ex(server_address)
