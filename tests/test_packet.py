@@ -22,7 +22,7 @@ confi = {
     "listeningInterface" : "eth0"
 }
 
-def send( server_address = ('192.168.178.60', 80) ):
+def send( server_address = ('192.168.0.241', 80) ):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.settimeout(5)
     sock.connect(server_address)
@@ -47,21 +47,31 @@ def runConnectorRefused():
     yield  con
     con.stop()
 
+@pytest.fixture
+def runConnectorAborted():
+    confi['state'] = 'BEGIN'
+    confi['action'] = 'BEGIN'
+    confi['parameter'] = 'RST'
+    con = Connector(confi, debug=3)
+    con.runbg()
+    yield  con
+    con.stop()
+
 
 
 # This test case verifies that the connection
-# is reset by the server side (RST sent between 2 send() ) 
- 
+# is reset by the server side (RST sent between 2 send() )
+
 def test_packet_1(runConnector):
     try:
         send()
     except socket.error, v:
         errorcode = v[0]
         assert errorcode == errno.ECONNRESET
-        
+
 # This test case verifies that the connection establishment
-# is reset by the server side (RST sent before SYN ACK ) 
-# NOTE  I need to send a RST PSH ACK (PSH is just to pass through the 
+# is reset by the server side (RST sent before SYN ACK )
+# NOTE  I need to send a RST PSH ACK (PSH is just to pass through the
 #       iptables rule) because without the ACK the connect() will just
 #       timeout, but not ECONNREFUSED
 def test_packet_2(runConnectorRefused):
@@ -71,7 +81,13 @@ def test_packet_2(runConnectorRefused):
         errorcode = v[0]
         assert errorcode == errno.ECONNREFUSED
 
-
+def test_packet_3(runConnectorAborted):
+    try:
+        send()
+    except socket.error, v:
+        #import pdb; pdb.set_trace()
+        errorcode = v[0]
+        assert errorcode == errno.ECONNABORTED
 
 
 
