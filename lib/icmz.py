@@ -6,7 +6,6 @@
 
 from scapy.all import *
 from common import *
-from scapy.layers.dns import DNSRR, DNS, DNSQR
 import time
 
 # Just a small utility to get from system the ip of a specific network interface
@@ -37,17 +36,12 @@ class ICMZee(Automaton):
         
     def master_filter(self, pkt):
         return  (IP in pkt and ICMP in pkt \
-        	    and pkt[IP].dst == self.localAddr) 
+                and pkt[IP].dst == self.localAddr) 
 
     # BEGIN
     @ATMT.state(initial=1)
     def BEGIN(self):
         self.l3 = IP()/ICMP()
-        self.l3_tcp = 0
-        self.srcIP = None
-        self.srcl4 = None
-
-        #self.lastHttpRequest = ""
         raise  self.LISTEN()
     
     # LISTEN
@@ -62,12 +56,16 @@ class ICMZee(Automaton):
             self.l3[IP].src = self.localAddr
             self.l3[IP].dst = pkt[IP].src
             self.l3[ICMP].type = 3
-            self.l3[ICMP].code = 1
-            self.srcIP = pkt[IP]
+            if str(self.jsonConfig['icmpParam']) == 'EHOSTUNREACH':
+                self.l3[ICMP].code = 1
+            if str(self.jsonConfig['icmpParam']) == 'ENETUNREACH':
+                self.l3[ICMP].code = 0
+            if str(self.jsonConfig['icmpParam']) == 'EHOSTDOWN':
+                self.l3[ICMP].code = 7
 
             raise self.LISTEN()
 
     @ATMT.action(received_ICMP)
     def send_echo_response(self):
-        self.send(self.l3/self.srcIP)
+        self.send(self.l3)
         
