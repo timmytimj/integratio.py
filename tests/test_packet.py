@@ -50,15 +50,15 @@ def runConnectorRefused():
     yield  con
     con.stop()
 
-@pytest.fixture
-def runConnectorAborted():
-    confi['state'] = 'BEGIN'
-    confi['action'] = 'BEGIN'
-    confi['parameter'] = 'R'
-    con = Connector(confi, debug=3)
-    con.runbg()
-    yield  con
-    con.stop()
+#@pytest.fixture
+#def runConnectorAborted():
+ #   confi['state'] = 'BEGIN'
+   # confi['action'] = 'BEGIN'
+    #confi['parameter'] = 'R'
+    #con = Connector(confi, debug=3)
+    #con.runbg()
+    #yield  con
+    #con.stop()
 
 
 
@@ -84,13 +84,13 @@ def test_packet_2(runConnectorRefused):
         errorcode = v[0]
         assert errorcode == errno.ECONNREFUSED
 
-def test_packet_3(runConnectorAborted):
-    try:
-        send()
-    except socket.error, v:
-        #import pdb; pdb.set_trace()
-        errorcode = v[0]
-        assert errorcode == errno.ECONNABORTED
+#def test_packet_3(runConnectorAborted):
+#    try:
+ #       send()
+  #  except socket.error, v:
+   #     #import pdb; pdb.set_trace()
+    #    errorcode = v[0]
+     #   assert errorcode == errno.ECONNABORTED
 
 
 

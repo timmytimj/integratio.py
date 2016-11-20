@@ -76,7 +76,6 @@ def test_multiConnections(makeRequestMultiConnections):
     assert makeRequestMultiConnections[1].content == "Response for the 404 error"
     assert makeRequestMultiConnections[1].headers == {'Date': 'Mon, 28 Nov 2016 18:51:19 GMT', 'Connection': 'close', 'Content-length': '26', 'Server': 'Apache/2.4.10 (Unix)'}
 
-    #import pdb; pdb.set_trace()
     # Asserting the response for resource "/favicon.ico"
     assert makeRequestMultiConnections[2].status_code == 200
     assert makeRequestMultiConnections[2].content == "FavICO"

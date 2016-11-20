@@ -1,5 +1,3 @@
 {
-  "test_packet.py::test_packet_1": true, 
-  "test_packet.py::test_packet_2": true, 
-  "test_packet.py::test_packet_3": true
+  "test_delay.py::test_delay_2": true
 }
