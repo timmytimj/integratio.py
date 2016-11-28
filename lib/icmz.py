@@ -36,6 +36,7 @@ class ICMZee(Automaton):
         
     def master_filter(self, pkt):
         return  (IP in pkt and ICMP in pkt \
+                and not((TCP in pkt) or (UDP in pkt) or(DNS in pkt)) \
                 and pkt[IP].dst == self.localAddr) 
 
     # BEGIN
@@ -52,17 +53,24 @@ class ICMZee(Automaton):
     @ATMT.receive_condition(LISTEN)
     def received_ICMP(self, pkt):
         if (ICMP in pkt):
-            print "got icmp & TCP", pkt[ICMP].type
+            print "got icmp with custom data of expected length:", pkt[ICMP].type,pkt[ICMP].load
             self.l3[IP].src = self.localAddr
             self.l3[IP].dst = pkt[IP].src
-            self.l3[ICMP].type = 3
-            if str(self.jsonConfig['icmpParam']) == 'EHOSTUNREACH':
-                self.l3[ICMP].code = 1
-            if str(self.jsonConfig['icmpParam']) == 'ENETUNREACH':
-                self.l3[ICMP].code = 0
-            if str(self.jsonConfig['icmpParam']) == 'EHOSTDOWN':
-                self.l3[ICMP].code = 7
+            # self.l3[ICMP].type = 3
+            # self.l3[ICMP].id = pkt[ICMP].id
+            self.l3[ICMP].load = pkt[ICMP].load
 
+            if (len(pkt[ICMP].load)<6):
+                if int(self.jsonConfig['icmpResponse'], 16) == int(pkt[ICMP].load, 16):
+                   self.l3[ICMP].type = 3
+                   self.l3[ICMP].code = int(pkt[ICMP].load, 16)
+                else:
+                   self.l3[ICMP].type = 0
+                   # self.l3[ICMP].code = 0
+            else:
+                self.l3[ICMP].type = 0
+                # self.l3[ICMP].code = 0
+            
             raise self.LISTEN()
 
     @ATMT.action(received_ICMP)

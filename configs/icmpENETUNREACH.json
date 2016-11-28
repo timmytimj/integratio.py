@@ -3,7 +3,7 @@
 	"category" : "time",
 	"state" :"BEGIN",
 	"action":"BEGIN",
-	"icmpParam":"ENETUNREACH",
+	"icmpResponse":"0x03",
 	"parameter" : 6,
 	"listeningPort" : 80,
 	"listeningAddress" : "testing.com"	
