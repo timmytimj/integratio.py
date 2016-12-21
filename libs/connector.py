@@ -61,7 +61,7 @@ class Connector(Automaton):
             return  ( IP in pkt and TCP in pkt \
                     and pkt[TCP].dport == self.localPort
                     )
-    
+
     # This is a tool method used to recognized if 'pkt'
     # is a retransmitted packet or not.
     # This will be useful when we will implement different retransmission policies
@@ -69,7 +69,7 @@ class Connector(Automaton):
     def isRetransmit(self, pkt):
         if (self.lastReceived == ""):
             return False
-        
+
         if(Padding in pkt):
             pkt[Padding] = None
         if(Padding in self.lastReceived):
@@ -90,13 +90,21 @@ class Connector(Automaton):
     # BEGIN state
     @ATMT.state(initial=1)
     def CON_BEGIN(self):
-        # DNZee component for DNS look-up from browser 
+        # DNZee component for DNS look-up from browser
         # DNS is using UDP-only implementation for the time-being.
-        dnz = DNZee(self.config, debug=3)
-        dnzThread = Thread(target=dnz.run, name='DNS_Thread')
-        dnzThread.daemon = True
-        # Starting the TCZ Threads
-        dnzThread.start()
+
+        if self.config['category'] == 'packet':
+
+            # Create DNZ Objects
+            dnz = DNZee(self.config, debug=3)
+
+            # Prepare DNZ Thread
+            dnzThread = Thread(target=dnz.run, name='DNS_Thread')
+            dnzThread.daemon = True
+
+            # Starting the TCZ and DNZ Threads
+            dnzThread.start()
+
         raise self.CON_LISTEN()
 
     @ATMT.state()
@@ -105,7 +113,7 @@ class Connector(Automaton):
 
     @ATMT.receive_condition(CON_LISTEN)
     def con_receive_syn(self, pkt):
-        
+
         if( 'S' in flags(pkt[TCP].flags) and not self.isRetransmit(pkt) ):
             # tcz = TCZee(self.config, pkt, debug=3)
             # Check impact of DEBUG messages on performances
@@ -145,11 +153,17 @@ class Connector(Automaton):
                 # For the moment only a TCZee is needed for the
                 # packet use case.
                 # TODO need to mix with content use cases
+
+                # Create TCZ and DNZ Objects
                 tcz = TCZee(self.config, pkt, debug=3)
+
+                # Prepare TCZ Thread
                 tczThread = Thread(target=tcz.run, name='tcz_Thread_Packet')
-                tczThread.deamon = True
+                tczThread.daemon = True
+
+                # Starting the TCZ and DNZ Threads
                 tczThread.start()
-                
+
             self.lastReceived = pkt
             self.connections.append(tcz)
             # TODO here we create a new instance of

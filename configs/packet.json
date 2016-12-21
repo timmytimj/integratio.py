@@ -1,10 +1,22 @@
 {
 	"testID" : "Packet001",
-	"category" : "packet",
-    "state" : "ESTABLISHED",
+	"category" :"packet",
+        "state" : "ESTABLISHED",
 	"action" :"sendAck",
 	"parameter" : "R",
 	"listeningPort" : 80,
-	"listeningAddress" : "testing.com",	
-    "listeningInterface" : "wlan0"
+	"listeningAddress" : "abc.com",
+    "listeningInterface" : "wlan0",
+    "dnzLookUp" :   [
+                {
+                    "address"   : "testing.com",
+                    "dnsAnswer" : "192.168.2.1"
+
+                },
+                {
+                    "address"   : "google.com",
+                    "dnsAnswer" : "192.168.2.21"
+
+                }
+            ]
 }
