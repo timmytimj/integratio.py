@@ -78,25 +78,30 @@ from threading import Thread
 
 class TCZee(Automaton):
     
-    def confTCZ(port = 80, interface = 'eth0'):
+    def confTCZ(self, port = 80, interface = 'eth0'):
         # burning and looting tonight
         self.localPort = port
         self.interface = interface 
 
-    def addDelay():
-        # something something something dark side
+    def addDelayConf(self, td):
+        if isinstance(td, confDelay):
+            self.tDelays.append(td)          
 
-    def addPacket():
-        # something something something empire
+    def addPacketConf(self, tp):
+        if isinstance(tp, confTCZ) or isinstance(tp, confICMZ):
+            self.tPackets.append(tp)
 
     def parse_args(self, jsonConfig={}, pkt = IP(), **kargs):
-        # DEBUG
+        
         #print "[DEBUG] Starting processing parameters"
         Automaton.parse_args(self, **kargs)
         self.initSYN = pkt
-
+        
         self.remotePort = self.initSYN[TCP].sport
         self.remoteAddr = self.initSYN[IP].src
+
+        self.tDelays = []
+        self.tPackets = []
 
         # For some reason, self.l3 is not available at this point in time
         #self.l3[TCP].sport = self.initSYN[TCP].dport
@@ -179,21 +184,23 @@ class TCZee(Automaton):
         calframe = inspect.getouterframes(curframe, 1)
         print "\t\t[NEW DEBUG] Caller frame: ", calframe[1][3]+ "-- current Thread --" + (threading.current_thread().name) + ", ID -- "+ str(threading.current_thread().ident)+"\n"
 
-        ''' BD: Commented my commmit code as its only a refernce during  discussions.'''
+        # Check for time tests
+        fd = isTestRelevant(self.tDelay, self.state.state, calframe[1][3])
+        fp = isTestRelevant(self.tPackets, self.state.state, calframe[1][3])
 
-        if isTestRelevant(self.jsonConfig, 'time', self.state.state, calframe[1][3]):
-            # This is added only for debug purposes
-            print "Sleep for state %s, category %s, parameter %d -- current Thread -- %s"%(self.jsonConfig['category'], \
-                    self.jsonConfig['state'], \
-                    self.jsonConfig['parameter'], threading.current_thread().name)
-            time.sleep(self.jsonConfig['parameter'])
-        # This is a nice place also for specific packet response, 
-        # not only for time category
-        if isTestRelevant(self.jsonConfig, 'packet', self.state.state, calframe[1][3]):
-                    pkt[TCP].flags = self.jsonConfig['parameter']
-                    print "\t\t[NEW DEBUG] Here we should have the packet handling test case -- current Thread --%s, ID -- %d" \
-                        %(threading.current_thread().name, threading.current_thread().ident)
-                    #print pkt.show2()
+        if isinstance(fd, confDelay):
+            time.sleep(i.time)
+
+        if isinstance(fp, confTCZ): 
+            pkt[TCP].flags = fp.flags
+        elif isinstance(fp, confICMZ):
+            pkt = IP(src=pkt[IP].src, dst=pkt[IP].dst)/ICMP(type=fp.typ, code=fp.code)/self.lastReceived[IP]
+        else:
+            pass
+        
+
+
+
 
         super(TCZee, self).send(pkt)
 

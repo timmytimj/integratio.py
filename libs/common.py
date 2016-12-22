@@ -47,13 +47,11 @@ def chunkstring(string, length):
 
 # Tool method to check if the current test is relevant
 # for the current STATE and Action
-def isTestRelevant(config, category, state, action):
+def isTestRelevant(lista, state, action):
     ret = False
-    if 'category' in config and config['category'] == category:
-        if 'state' in config and config['state'] == state:
-            if 'action' in config and config['action'] == action:
-                ret = True
-
+    for i in lista:
+        if i.state == state and i.action == action:
+            ret = i
     return ret
 
 class tConf(object):
