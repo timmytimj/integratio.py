@@ -146,10 +146,12 @@ class Connector(Automaton):
                 tczThread.start()
                 httzThread.start()
             elif self.config['category'] == 'packet':
-                # For the moment only a TCZee is needed for the
-                # packet use case.
-                # TODO need to mix with content use cases
+                # MZ 22.12.2016 Same as for the time category above
                 tcz = TCZee(self.config, pkt, debug=3)
+                tcz.confTCZ(self.localPort, self.interface)
+                cp = confTCZ(self.config['state'], self.config['action'], self.config['parameter'])
+                tcz.addPacketConf(cp)
+
                 tczThread = Thread(target=tcz.run, name='tcz_Thread_Packet')
                 tczThread.deamon = True
                 tczThread.start()

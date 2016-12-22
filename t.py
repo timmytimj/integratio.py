@@ -4,7 +4,7 @@ import json
 from scapy.all import *
 import sys
 sys.path.append('.')
-from lib.connector import Connector
+from libs.connector import Connector
 
 log_interactive.setLevel(1)
 

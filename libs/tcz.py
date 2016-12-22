@@ -81,7 +81,21 @@ class TCZee(Automaton):
     def confTCZ(self, port = 80, interface = 'eth0'):
         # burning and looting tonight
         self.localPort = port
-        self.interface = interface 
+        self.interface = interface
+
+        # We are assuming here that IntegratioWebServer is listening on wlan0 interface
+        try:
+            # TODO  This step define on which interface (and so IP address) the TCZ will listen
+            #   to. Should not be hardcoded but should be part of the JSON configuration
+            self.localAddr = get_ip_address(self.interface)
+            #self.myIp = 0
+            print "MyIP address: " + str(self.localAddr)
+        except IOError:
+            self.localAddr = 0
+            print "\t[WARNING] " + self.interface + "interface not available"
+            print "not possible to get local IP address for master filter."
+            pass
+ 
 
     def addDelayConf(self, td):
         if isinstance(td, confDelay):
@@ -112,19 +126,6 @@ class TCZee(Automaton):
 
         # Keeping track of the last valid packet received
         self.lastReceived = ""
-
-        # We are assuming here that IntegratioWebServer is listening on wlan0 interface
-        try:
-            # TODO  This step define on which interface (and so IP address) the TCZ will listen
-            #   to. Should not be hardcoded but should be part of the JSON configuration
-            self.localAddr = get_ip_address(self.interface)
-            #self.myIp = 0
-            print "MyIP address: " + str(self.localAddr)
-        except IOError:
-            self.localAddr = 0
-            print "\t[WARNING] " + self.interface + "interface not available"
-            print "not possible to get local IP address for master filter."
-            pass
 
     # With new architecture, we are handling now multiple TCP connection,
     # but only 1 per TCZee instance. So the master filter should only
@@ -181,7 +182,7 @@ class TCZee(Automaton):
         print "\t\t[NEW DEBUG] Caller frame: ", calframe[1][3]+ "-- current Thread --" + (threading.current_thread().name) + ", ID -- "+ str(threading.current_thread().ident)+"\n"
 
         # Check for time tests
-        fd = isTestRelevant(self.tDelay, self.state.state, calframe[1][3])
+        fd = isTestRelevant(self.tDelays, self.state.state, calframe[1][3])
         fp = isTestRelevant(self.tPackets, self.state.state, calframe[1][3])
 
         if isinstance(fd, confDelay):
