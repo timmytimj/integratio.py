@@ -20,10 +20,10 @@ config = {\
     "parameter" : 6,\
     "listeningPort" : 52413,\
     "listeningAddress" : "testing.com",\
-    "listeningInterface" : "wlan0"\
+    "listeningInterface" : "eth0"\
 }
 
-my_IPaddress = get_my_IPaddress('wlan0')
+my_IPaddress = get_my_IPaddress('eth0')
 
 def connect( time = 3, server_address = (my_IPaddress, 80) ):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

@@ -15,7 +15,7 @@ config = {
     "parameter" : 6,\
     "listeningPort" : 80,\
     "listeningAddress" : "testing.com",\
-    "listeningInterface" : "wlan0",\
+    "listeningInterface" : "eth0",\
     "resources" :   [\
                 {\
                     "resource"  : "/",\
@@ -50,7 +50,7 @@ def makeRequestMultiPacket():
     con = Connector(config, debug=3)
     con.runbg()
 
-    my_IPaddress = "http://%s" % (get_my_IPaddress('wlan0'))
+    my_IPaddress = "http://%s" % (get_my_IPaddress('eth0'))
 
     r = requests.get(my_IPaddress + '/favicon.ico', timeout=5)
 

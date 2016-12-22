@@ -77,15 +77,23 @@ from Queue import Queue
 from threading import Thread
 
 class TCZee(Automaton):
+    
+    def confTCZ(port = 80, interface = 'eth0'):
+        # burning and looting tonight
+        self.localPort = port
+        self.interface = interface 
+
+    def addDelay():
+        # something something something dark side
+
+    def addPacket():
+        # something something something empire
+
     def parse_args(self, jsonConfig={}, pkt = IP(), **kargs):
         # DEBUG
         #print "[DEBUG] Starting processing parameters"
         Automaton.parse_args(self, **kargs)
         self.initSYN = pkt
-        if 'listeningPort' in jsonConfig:
-            self.localPort = int( jsonConfig['listeningPort'] )
-        else:
-            self.localPort = 80
 
         self.remotePort = self.initSYN[TCP].sport
         self.remoteAddr = self.initSYN[IP].src
@@ -100,15 +108,9 @@ class TCZee(Automaton):
         # recv and send buffer to be used by the external     httz component
         self.recv = Queue()
         self.toSend = ""
-        self.jsonConfig=jsonConfig
 
         # Keeping track of the last valid packet received
         self.lastReceived = ""
-
-        if 'listeningInterface' in self.jsonConfig:
-            self.interface = str( self.jsonConfig['listeningInterface'] )
-        else:
-            self.interface = "wlan0"
 
         # We are assuming here that IntegratioWebServer is listening on wlan0 interface
         try:
@@ -119,7 +121,7 @@ class TCZee(Automaton):
             print "MyIP address: " + str(self.localAddr)
         except IOError:
             self.localAddr = 0
-            print "\t[WARNING] 'wlan0' interface not available"
+            print "\t[WARNING] " + self.interface + "interface not available"
             print "not possible to get local IP address for master filter."
             pass
 

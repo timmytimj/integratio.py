@@ -56,3 +56,41 @@ def isTestRelevant(config, category, state, action):
 
     return ret
 
+class tConf(object):
+    def __init__(self, state = "ESTABLISHED", action = "sendAck"):
+        self.state = state
+        self.action = action
+        
+class confDelay(tConf):
+    def __init__(self, state = "ESTABLISHED", action = "sendAck", time = 3):
+        self.time = time
+        super(confDelay, self).__init__(state, action)
+
+class confTCZ(tConf):
+    def __init__(self, state = "ESTABLISHED", action = "sendAck", flags = 'R'):
+        self.flags = flags
+        super(confTCZ, self).__init__(state, action)
+
+class confICMZ(tConf):
+    def __init__(self, state = "ESTABLISHED", action = "sendAck", typ = 3, code = 3):
+        self.typ = typ
+        self.code = code
+        super(confICMZ, self).__init__(state, action)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
