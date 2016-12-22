@@ -115,8 +115,12 @@ class Connector(Automaton):
             # status_http = 0 means dummy httz component used for time.
             # status_http = 1 means proper httz component used for content.
             if self.config['category']=='time':
-                # Create TCZ Object
+                # MZ 22.12.2016 Still passing config, even if TCZ does not use it anymore.
+                # For this reason we need to configure TCZ manually
                 tcz = TCZee(self.config, pkt, debug=3)
+                tcz.confTCZ(self.localPort, self.interface)
+                cd = confDelay(self.config['state'], self.config['action'], self.config['parameter'])
+                tcz.addDelayConf(cd)
 
                 # Prepare only the Thread for TCZ
                 # BD: removed the threading in my current testing

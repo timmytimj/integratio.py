@@ -103,10 +103,6 @@ class TCZee(Automaton):
         self.tDelays = []
         self.tPackets = []
 
-        # For some reason, self.l3 is not available at this point in time
-        #self.l3[TCP].sport = self.initSYN[TCP].dport
-        #self.l3[TCP].dport = self.initSYN[TCP].sport
-
         self.curAck = 0
         self.curSeq = 0
 
@@ -198,14 +194,7 @@ class TCZee(Automaton):
         else:
             pass
         
-
-
-
-
         super(TCZee, self).send(pkt)
-
-
-
 
     # @ATMT.action(receive_pshAck)
     def send_response(self):
