@@ -1,5 +1,5 @@
 from scapy.all import *
-from lib.connector import Connector
+from libs.connector import Connector
 from scapy.all import Automaton
 from functools import wraps
 

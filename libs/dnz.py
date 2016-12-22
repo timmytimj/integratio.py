@@ -24,6 +24,14 @@ class DNZee(Automaton):
         self.responseReady = 0
         self.synAckReady = 0
         self.myIp = 0
+        self.lookupDict = {}
+
+	# Parsing the DNz look up into a single instance varible to avoid
+        # parsing for every look-up
+        lookupDB = jsonConfig['dnzLookUp']
+        for record in lookupDB:
+            self.lookupDict.update(record)   
+
         # TODO  Keep track of last processed HTTP request, to 
         #   avoid problems with retransmission. Need to be refactored and cleaned up
         self.lastHttpRequest = ""
@@ -62,10 +70,10 @@ class DNZee(Automaton):
             self.l3[DNS].rd = pkt[DNS].rd
             self.l3[DNS].qdcount = pkt[DNS].qdcount
             self.l3[DNS].qd = pkt[DNS].qd
-            print str( self.jsonConfig['listeningAddress'] )
-            if (self.jsonConfig['listeningAddress'] == pkt[DNS].qd.qname[:-1]) :
+            
+            if(self.lookupDict.has_key(pkt[DNS].qd.qname[:-1])) :
                 self.l3[DNS].ancount = 1
-                self.l3[DNS].an = DNSRR(rrname=self.l3[DNS].qd.qname, type='A', ttl=3600, rdata='192.168.1.6' )
+                self.l3[DNS].an = DNSRR(rrname=self.l3[DNS].qd.qname, type='A', ttl=3600, rdata=self.lookupDict[pkt[DNS].qd.qname[:-1]] )
             else:
                 self.l3[DNS].ancount = 0
                 self.l3[DNS].an = None
