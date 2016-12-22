@@ -3,20 +3,16 @@
 	"category" :"packet",
         "state" : "ESTABLISHED",
 	"action" :"sendAck",
-	"parameter" : "R",
+	"parameter" : "RPA",
 	"listeningPort" : 80,
 	"listeningAddress" : "abc.com",
-    "listeningInterface" : "wlan0",
-    "dnzLookUp" :   [
+        "listeningInterface" : "wlan0",
+        "dnzLookUp" :   [
                 {
-                    "address"   : "testing.com",
-                    "dnsAnswer" : "192.168.2.1"
-
+                    "testing.com" : "192.168.2.1"
                 },
                 {
-                    "address"   : "google.com",
-                    "dnsAnswer" : "192.168.2.21"
-
+                    "google.com" : "192.168.2.21"
                 }
             ]
 }

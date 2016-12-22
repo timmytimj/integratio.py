@@ -2,7 +2,6 @@ from scapy.all import *
 from common import *
 from tcz import TCZee
 from httz import HTTZee
-from dnz import DNZee
 import time
 import sys
 import signal
@@ -49,18 +48,16 @@ class Connector(Automaton):
             pass
 
         self.connections = []
+        self.lookupDict = {}
+        self.l3_dnz = IP()/UDP()/DNS() # Packet to be used with the DNZ component 
 
     # check only matching incoming packets
     def master_filter(self, pkt):
         if (self.localAddr != 0):
-            return  ( IP in pkt and TCP in pkt \
-                    and pkt[IP].dst == self.localAddr \
-                    and pkt[TCP].dport == self.localPort
-                    )
+            return  ( IP in pkt \
+                    and pkt[IP].dst == self.localAddr)
         else:
-            return  ( IP in pkt and TCP in pkt \
-                    and pkt[TCP].dport == self.localPort
-                    )
+            return  ( IP in pkt )
 
     # This is a tool method used to recognized if 'pkt'
     # is a retransmitted packet or not.
@@ -85,8 +82,6 @@ class Connector(Automaton):
             else:
                 return False
 
-
-
     # BEGIN state
     @ATMT.state(initial=1)
     def CON_BEGIN(self):
@@ -94,16 +89,11 @@ class Connector(Automaton):
         # DNS is using UDP-only implementation for the time-being.
 
         if self.config['category'] == 'packet':
-
-            # Create DNZ Objects
-            dnz = DNZee(self.config, debug=3)
-
-            # Prepare DNZ Thread
-            dnzThread = Thread(target=dnz.run, name='DNS_Thread')
-            dnzThread.daemon = True
-
-            # Starting the TCZ and DNZ Threads
-            dnzThread.start()
+            # Parsing the DNz look up into a single instance varible to avoid
+            # parsing for every look-up
+            lookupDB = self.config['dnzLookUp']
+            for record in lookupDB:
+                self.lookupDict.update(record)
 
         raise self.CON_LISTEN()
 
@@ -111,10 +101,12 @@ class Connector(Automaton):
     def CON_LISTEN(self):
         pass
 
-    @ATMT.receive_condition(CON_LISTEN)
-    def con_receive_syn(self, pkt):
+    @ATMT.receive_condition(CON_LISTEN, prio=1)
+    def tcz_receive_syn(self, pkt):
 
-        if( 'S' in flags(pkt[TCP].flags) and not self.isRetransmit(pkt) ):
+        if( IP in pkt and TCP in pkt \
+            and pkt[TCP].dport == self.localPort \
+            and 'S' in flags(pkt[TCP].flags) and not self.isRetransmit(pkt) ):
             # tcz = TCZee(self.config, pkt, debug=3)
             # Check impact of DEBUG messages on performances
 
@@ -181,4 +173,37 @@ class Connector(Automaton):
             # 4. When connection is closed, HTTZ Thread should die
             #    and notify Connector
 
-        raise self.CON_LISTEN()
+            raise self.CON_LISTEN()
+    
+    @ATMT.receive_condition(CON_LISTEN, prio=0)
+    def dnz_query(self, pkt):
+        # Checking if what I got has a DNS layer 
+        # print "Port :",pkt[UDP].dport
+        if (IP in pkt and UDP in pkt \
+           and pkt[UDP].dport == 53 \
+           and pkt[IP].dport == 53 \
+           and self.config['category'] == 'packet'):
+            self.l3_dnz[IP].dst = pkt[IP].src
+            self.l3_dnz[IP].src = pkt[IP].dst
+            self.l3_dnz[IP].id  = pkt[IP].id
+            self.l3_dnz[UDP].dport = pkt[UDP].sport
+            self.l3_dnz[UDP].sport = 53
+            self.l3_dnz[DNS].id = pkt[DNS].id
+            self.l3_dnz[DNS].aa = 1
+            self.l3_dnz[DNS].qr = 1
+            self.l3_dnz[DNS].rd = pkt[DNS].rd
+            self.l3_dnz[DNS].qdcount = pkt[DNS].qdcount
+            self.l3_dnz[DNS].qd = pkt[DNS].qd
+
+            if(self.lookupDict.has_key(pkt[DNS].qd.qname[:-1])) :
+                self.l3_dnz[DNS].ancount = 1
+                self.l3_dnz[DNS].an = DNSRR(rrname=self.l3_dnz[DNS].qd.qname, type='A', ttl=3600, rdata=self.lookupDict[pkt[DNS].qd.qname[:-1]] )
+            else:
+                self.l3_dnz[DNS].ancount = 0
+                self.l3_dnz[DNS].an = None
+                self.l3_dnz[DNS].rcode = "name-error"
+            raise self.CON_LISTEN()
+
+    @ATMT.action(dnz_query)
+    def send_answer(self):
+        self.send(self.l3_dnz)	
