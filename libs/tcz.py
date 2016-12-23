@@ -186,7 +186,7 @@ class TCZee(Automaton):
         fp = isTestRelevant(self.tPackets, self.state.state, calframe[1][3])
 
         if isinstance(fd, confDelay):
-            time.sleep(i.time)
+            time.sleep(fd.time)
 
         if isinstance(fp, confTCZ): 
             pkt[TCP].flags = fp.flags

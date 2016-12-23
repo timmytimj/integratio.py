@@ -21,10 +21,10 @@ config = { \
     "parameter" : 3, \
     "listeningPort" : 80, \
     "listeningAddress" : "testing.com", \
-    "listeningInterface" : "lo" \
+    "listeningInterface" : "eth0" \
 }
 
-my_IPaddress = get_my_IPaddress('lo')
+my_IPaddress = get_my_IPaddress('eth0')
 
 def connect( time = 3, server_address = (my_IPaddress, 80) ):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -50,6 +50,7 @@ def runConnector():
     yield  con
     con.stop()
 
+
 # TCZ will wait 3 seconds before reply to SYN.
 # connect has a timeout of 1 in this test case.
 # TEST PASS if the connect(1) raise the Timeout
@@ -63,7 +64,7 @@ def runConnector():
 def test_delay_1(runConnector):
     with pytest.raises(socket.timeout):
 #    try:
-        connect(2)
+        connect(3)
 #    except socket.error, v:
 #        errorcode = v[0]
 #        assert errorcode == 110
