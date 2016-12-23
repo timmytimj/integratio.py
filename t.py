@@ -10,16 +10,23 @@ log_interactive.setLevel(1)
 
 jconfig = {
     "testID" : "Packet001",
-    "category" : "packet",
-#    "state"    : "BEGIN",
-    "state" : "ESTABLISHED",
+    "category" :"packet",
+        "state" : "ESTABLISHED",
     "action" :"sendAck",
-#    "action" : "BEGIN",
-    "parameter" : "RP",
+    "parameter" : "RPA",
     "listeningPort" : 80,
-    "listeningAddress" : "testing.com",
-    "listeningInterface" : "eth0"
+    "listeningAddress" : "abc.com",
+        "listeningInterface" : "eth0",
+        "dnzLookUp" :   [
+                {
+                    "testing.com" : "192.168.2.1"
+                },
+                {
+                    "google.com" : "192.168.2.21"
+                }
+            ]
 }
+ 
 
 
 
