@@ -17,7 +17,7 @@ jconfig = {\
         {\
             "state" : "ESTABLISHED",\
             "action" : "sendAck",\
-            "delay" : 1\
+            "delay" : 3\
         }\
     ]\
 }
