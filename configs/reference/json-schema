@@ -1,0 +1,80 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "http://marcozunino.it/integratio#",
+    "type" : "object",
+    "properties" : {
+    	"test-id"   :   {   "type" : "string" },
+        "interface" :   {	"type" : "string"},
+        "lis-port"  :   {   "type" : "number" },
+        "category"  :   {
+                            "type" : "string",
+                            "enum" : ["packet", "time", "content", "dns"]
+                        },
+        "sub-category" : {
+                            "type" : "string",
+                            "enum" : ["icmz", "tcz"]
+                        },
+        "parameter" :   {
+                            "type" : "array",
+                            "items" : {
+                            	"title" : "TestConf",
+                                 "type" : "object",
+                                 "anyOf": [
+                                     { "$ref": "#/definitions/tcz-conf" },
+                                     { "$ref": "#/definitions/icmz-conf" },
+                                     { "$ref": "#/definitions/dnz-conf" },
+                                     { "$ref": "#/definitions/time-conf" },
+                                     { "$ref": "#/definitions/content-conf" }
+                                 ]
+                        }
+        			}
+    },
+    "definitions" : {
+    	"tcz-conf" : {
+          	"type":"object",
+            "properties" : {
+            	"state" : {"type" : "string"},
+                "action" : {"type":"string"},
+                "flags" : {"type":"string"}  
+            },
+            "required" : ["state", "action", "flags"]
+        },
+        "icmz-conf": {
+          	"type":"object",
+            "properties" : {
+            	"state" : {"type" : "string"},
+                "action" : {"type":"string"},
+                "type" : {"type":"number"},
+                "code" : {"type":"number"}
+            },
+            "required" : ["state", "action", "type", "code"]
+        },
+        "dnz-conf" : {
+          	"type":"object",
+            "properties" : {
+                "q-addr" : {"type":"string"},
+                "response" : {"type":"string"}
+            },
+            "required" : ["q-addr", "response"]
+        },
+        "time-conf": {
+          	"type":"object",
+            "properties" : {
+            	"state" : {"type" : "string"},
+                "action" : {"type":"string"},
+                "delay" : {"type":"number"}
+            },
+            "required" : ["state", "action", "delay"]
+        },
+        "content-conf" : {
+        	"type":"object",
+            "properties" : {
+            	"resource" : {"type" : "string"},
+                "http-status":{"type" : "string"},
+                "headers" : {"type" : "string"},
+                "body" : {"type" : "string"}
+            },
+            "required" : ["resource", "body", "headers", "http-status"]
+        }
+    }
+}

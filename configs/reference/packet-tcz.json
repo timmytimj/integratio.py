@@ -1,0 +1,19 @@
+/*
+* Example of Packet TCZ test configuration
+*
+*/
+
+{
+	"test-id"  : "p-tcz001",
+    "interface": "eth0",
+    "lis-port" : 80,
+    "category" : "packet",
+    "sub-category" : "tcz",
+    "parameter": [
+      	{
+    		"state" : "ESTABLISHED",
+        	"action": "sendAck",
+        	"flags" : "RA"
+    	}
+    ]
+}

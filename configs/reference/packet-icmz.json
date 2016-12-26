@@ -1,0 +1,20 @@
+/*
+* Example of Packet ICMZ test configuration
+*
+*/
+
+{
+	"test-id"  : "p-icmz001",
+    "interface": "eth0",
+    "lis-port" : 80,
+    "category" : "packet",
+    "sub-category" : "icmz",
+    "parameter": [
+      	{
+    		"state" : "ESTABLISHED",
+        	"action": "sendAck",
+        	"type" : 3,
+          	"code" : 2
+    	}
+    ]
+}

@@ -1,0 +1,25 @@
+/*
+* Example of Content test configuration
+*
+*/
+
+{
+	"test-id"  : "content001",
+    "interface": "eth0",
+    "lis-port" : 80,
+    "category" : "content",
+    "parameter": [
+      	{
+    		"resource" : "/index.html",
+        	"http-status": "200 OK",
+        	"headers" : "Server: john.com\r\nDate: 2016-12-22 17:55\r\n\r\n",
+          	"body" : "Example of correct HTTP response"
+    	},
+      	{
+    		"resource" : "/404error.html",
+        	"http-status": "404 Not Found",
+        	"headers" : "Server: john.com\r\nDate: 2016-12-22 17:55\r\n\r\n",
+          	"body" : "Example of correct HTTP response"
+    	}
+    ]
+}

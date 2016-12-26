@@ -1,0 +1,23 @@
+/*
+* Example of Delay test configuration
+*
+*/
+
+{
+	"test-id"  : "delay001",
+    "interface": "eth0",
+    "lis-port" : 80,
+    "category" : "time",
+    "parameter": [
+      	{
+    		"state" : "ESTABLISHED",
+        	"action": "sendAck",
+        	"delay" : 6
+    	},
+        {
+    		"state" : "BEGIN",
+        	"action": "BEGIN",
+        	"delay" : 3
+    	}
+    ]
+}

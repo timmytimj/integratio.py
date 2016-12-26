@@ -1,0 +1,21 @@
+/*
+* Example of DNZ test configuration
+*
+*/
+
+{
+	"test-id"  : "dns001",
+    "interface": "eth0",
+    "lis-port" : 53,
+    "category" : "dns",
+    "parameter": [
+      	{
+    		"q-addr" : "www.google.com",
+        	"response": "192.168.178.60"
+    	},
+        {
+    		"q-addr" : "www.test.com",
+        	"response": "192.168.178.60"
+    	}
+    ]
+}
