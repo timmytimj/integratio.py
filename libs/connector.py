@@ -18,20 +18,28 @@ from Queue import Queue
 from threading import Thread
 
 class Connector(Automaton):
+
     def parse_args(self, jsonConfig={}, **kargs):
         Automaton.parse_args(self, **kargs)
         self.config = jsonConfig
         self.lastReceived = ""
-        # set listening port
-        if 'listeningPort' in jsonConfig:
-            self.localPort = int( jsonConfig['listeningPort'] )
+        
+        # Legacy JSON format, keep it for the moment until 
+        # migration to JSON-schema is completed
+        if 'listeningPort' in self.config:
+            self.localPort = int( self.config['listeningPort'] )
+        elif 'lis-port' in self.config:
+            self.localPort = int( self.config['lis-port'] )
         else:
             self.localPort = 80
 
-        # TODO This is duplicate code, we can keep it only in the connector
-        # and reference the local ip inform from the Connector in TCZee
+        # Legacy JSON format, keep it for the moment until 
+        # migration to JSON-schema is completed
         if 'listeningInterface' in self.config:
             self.interface = str( self.config['listeningInterface'] )
+        # This is the new and correct JSON value to expect
+        elif 'interface' in self.config:
+            self.interface = str( self.config['interface'] )
         else:
             self.interface = "wlan0"
 
@@ -115,14 +123,10 @@ class Connector(Automaton):
             # status_http = 0 means dummy httz component used for time.
             # status_http = 1 means proper httz component used for content.
             if self.config['category']=='time':
-                # MZ 22.12.2016 Still passing config, even if TCZ does not use it anymore.
-                # For this reason we need to configure TCZ manually
-                tcz = TCZee(self.config, pkt, debug=3)
-                tcz.confTCZ(self.localPort, self.interface)
-                cd = confDelay(self.config['state'], self.config['action'], self.config['parameter'])
-                tcz.addDelayConf(cd)
+                # MZ 26.12.2016 JSON is used again, but in a separate TCZee method TCZee.jsonConf()
+                # This method works with JSON-schema defined JSON config
+                tcz = TCZee(pkt, self.config, debug=3)
 
-                # Prepare only the Thread for TCZ
                 # BD: removed the threading in my current testing
                 tczThread = Thread(target=tcz.run, name='tcz_Thread_time')
                 tczThread.daemon = True
@@ -145,12 +149,15 @@ class Connector(Automaton):
                 # Starting the respective Threads
                 tczThread.start()
                 httzThread.start()
+
             elif self.config['category'] == 'packet':
-                # MZ 22.12.2016 Same as for the time category above
+                # MZ 26.12.2016 Same as for the time category above
+                # NOTE  We still pass JSON configuration from Connector to TCZ, but the TCZee.jsonConf() 
+                # method is now able to distinguish between 'packet' and 'delay' configuration, so the code here
+                # and at line 122 can be the same.
+                # Before consolidate 'time' and 'packet' in a single 'if branch', we need to discuss how DNS use
+                # cases fit in this logic.
                 tcz = TCZee(self.config, pkt, debug=3)
-                tcz.confTCZ(self.localPort, self.interface)
-                cp = confTCZ(self.config['state'], self.config['action'], self.config['parameter'])
-                tcz.addPacketConf(cp)
 
                 tczThread = Thread(target=tcz.run, name='tcz_Thread_Packet')
                 tczThread.deamon = True

@@ -8,23 +8,18 @@ from libs.connector import Connector
 
 log_interactive.setLevel(1)
 
-jconfig = {
-    "testID" : "Packet001",
-    "category" :"packet",
-        "state" : "ESTABLISHED",
-    "action" :"sendAck",
-    "parameter" : "RPA",
-    "listeningPort" : 80,
-    "listeningAddress" : "abc.com",
-        "listeningInterface" : "eth0",
-        "dnzLookUp" :   [
-                {
-                    "testing.com" : "192.168.2.1"
-                },
-                {
-                    "google.com" : "192.168.2.21"
-                }
-            ]
+jconfig = {\
+    "test-id" : "delay-001", \
+    "interface" : "eth0", \
+    "lis-port" : 80, \
+    "category" : "time", \
+    "parameter" : [\
+        {\
+            "state" : "ESTABLISHED",\
+            "action" : "sendAck",\
+            "delay" : 1\
+        }\
+    ]\
 }
  
 

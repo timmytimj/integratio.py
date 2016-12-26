@@ -78,6 +78,32 @@ from threading import Thread
 
 class TCZee(Automaton):
     
+    # Development tool to configure a TCZee with a JSON
+    def jsonConf(self, conf = {}):
+        # no validation on JSON structure because we will add
+        # validation based on JSON-schema
+        self.confTCZ(conf['lis-port'], conf['interface'])
+            
+        if conf['category'] == "time":
+            # Iterate on Delay parameters
+            for p in conf['parameter']:
+                cd = confDelay( p['state'], p['action'], p['delay'] )
+                self.addDelayConf(cd)
+
+        elif conf['category'] == "packet":
+            # afaf
+            if ('sub-category' in conf):
+                if conf['sub-category'] == "tcz":
+                    # TCZ
+                    for p in conf['parameter']:
+                        cp = confTCZ( p['state'], p['action'], p['flags'] )
+                        self.addPacketConf(cp)
+                elif conf['sub-category'] == "icmz":
+                    # ICMZ
+                    for p in conf['parameter']:
+                        cp = confTCZ( p['state'], p['action'], p['type'], p['code'] )
+                        self.addPacketConf(cp)
+
     def confTCZ(self, port = 80, interface = 'eth0'):
         # burning and looting tonight
         self.localPort = port
@@ -105,7 +131,7 @@ class TCZee(Automaton):
         if isinstance(tp, confTCZ) or isinstance(tp, confICMZ):
             self.tPackets.append(tp)
 
-    def parse_args(self, jsonConfig={}, pkt = IP(), **kargs):
+    def parse_args(self, pkt = IP(), jsonConfig = {},  **kargs):
         
         #print "[DEBUG] Starting processing parameters"
         Automaton.parse_args(self, **kargs)
@@ -126,6 +152,10 @@ class TCZee(Automaton):
 
         # Keeping track of the last valid packet received
         self.lastReceived = ""
+
+        # IF a JSON configuration is available, we use it
+        if jsonConfig != {}:
+            self.jsonConf(jsonConfig)
 
     # With new architecture, we are handling now multiple TCP connection,
     # but only 1 per TCZee instance. So the master filter should only

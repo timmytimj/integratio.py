@@ -14,17 +14,20 @@ import errno
 
 
 config = { \
-    "testID" : "Delay02", \
+    "test-id" : "delay-001", \
+    "interface" : "eth0", \
+    "lis-port" : 80, \
     "category" : "time", \
-    "state" :"BEGIN", \
-    "action":"BEGIN",\
-    "parameter" : 3, \
-    "listeningPort" : 80, \
-    "listeningAddress" : "testing.com", \
-    "listeningInterface" : "eth0" \
+    "parameter" : [\
+        {\
+            "state" : "BEGIN",\
+            "action" : "BEGIN",\
+            "delay" : 3\
+        }\
+    ]\
 }
 
-my_IPaddress = get_my_IPaddress('eth0')
+my_IPaddress = get_my_IPaddress(config['interface'])
 
 def connect( time = 3, server_address = (my_IPaddress, 80) ):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -42,9 +45,6 @@ def connect_ex( time = 3, server_address = (my_IPaddress, 80) ):
 
 @pytest.fixture
 def runConnector():
-    # Starting the Connector thread
-#    fileConfig = io.open('../configs/delay.json')
-#    config = json.load(fileConfig)
     con = Connector(config, debug=3)
     con.runbg()
     yield  con
