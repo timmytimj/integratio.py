@@ -51,6 +51,7 @@ def isTestRelevant(lista, state, action):
     ret = False
     for i in lista:
         if i.state == state and i.action == action:
+            print "[DEBUG][isTestRelevant] ret: " + str(ret) + ". Checking " + str(type(i))
             ret = i
     return ret
 

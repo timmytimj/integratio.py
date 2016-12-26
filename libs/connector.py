@@ -131,7 +131,7 @@ class Connector(Automaton):
 
             elif self.config['category']=='content':
                 # Create TCZ and HTTZ Objects
-                tcz = TCZee(self.config, pkt, debug=3)
+                tcz = TCZee(pkt, self.config, debug=3)
                 httz = HTTZee(tcz)
 
                 # Prepare HTTZ Thread
@@ -152,7 +152,7 @@ class Connector(Automaton):
                 # and at line 122 can be the same.
                 # Before consolidate 'time' and 'packet' in a single 'if branch', we need to discuss how DNS use
                 # cases fit in this logic.
-                tcz = TCZee(self.config, pkt, debug=3)
+                tcz = TCZee( pkt, self.config, debug=3)
 
                 tczThread = Thread(target=tcz.run, name='tcz_Thread_Packet')
                 tczThread.deamon = True

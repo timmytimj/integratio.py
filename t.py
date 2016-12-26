@@ -12,18 +12,15 @@ jconfig = {\
     "test-id" : "delay-001", \
     "interface" : "eth0", \
     "lis-port" : 80, \
-    "category" : "time", \
+    "category" : "packet", \
+    "sub-category" : "icmz",
     "parameter" : [\
         {\
             "state" : "ESTABLISHED",\
             "action" : "sendAck",\
-            "delay" : 0\
-        },\
-        {\
-            "state" : "ESTABLISHED",\
-            "action" : "send_finAck",\
-            "delay" : 0\
-        }\
+            "type" : 3,\
+            "code" : 1\
+        }
     ]\
 }
  

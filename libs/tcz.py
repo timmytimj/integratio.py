@@ -101,7 +101,7 @@ class TCZee(Automaton):
                 elif conf['sub-category'] == "icmz":
                     # ICMZ
                     for p in conf['parameter']:
-                        cp = confTCZ( p['state'], p['action'], p['type'], p['code'] )
+                        cp = confICMZ( p['state'], p['action'], p['type'], p['code'] )
                         self.addPacketConf(cp)
 
     def confTCZ(self, port = 80, interface = 'eth0'):
@@ -219,6 +219,7 @@ class TCZee(Automaton):
             time.sleep(fd.time)
 
         if isinstance(fp, confTCZ): 
+            print "[DEBUG][26.12.2016] Packet TCZ - Assigning flags"
             pkt[TCP].flags = fp.flags
         elif isinstance(fp, confICMZ):
             pkt = IP(src=pkt[IP].src, dst=pkt[IP].dst)/ICMP(type=fp.typ, code=fp.code)/self.lastReceived[IP]
