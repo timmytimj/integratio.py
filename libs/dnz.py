@@ -15,7 +15,7 @@ import fcntl
 import struct
 
 class DNZee(Automaton):
-    def parse_args(self, jsonConfig={}, sport=53, **kargs):
+    def parse_args(self, config={}, sport=53, **kargs):
         # DEBUG 
         #print "[DEBUG] Starting processing parameters" 
         Automaton.parse_args(self, **kargs)
@@ -27,7 +27,16 @@ class DNZee(Automaton):
         # TODO  Keep track of last processed HTTP request, to 
         #   avoid problems with retransmission. Need to be refactored and cleaned up
         self.lastHttpRequest = ""
-        self.jsonConfig=jsonConfig
+        self.config=config
+        self.DNS_lookup = {}
+
+        # Parsing the "dnz-conf" object type of json-schema to avoid
+        # parsing for every look-up
+        lookupDB = self.config['parameter']
+        for record in lookupDB:
+            key = record['q-addr']
+            value = record['response']
+            self.DNS_lookup[key]=value
         
     def master_filter(self, pkt):
         return  ( IP in pkt and UDP in pkt \
@@ -62,8 +71,8 @@ class DNZee(Automaton):
             self.l3[DNS].rd = pkt[DNS].rd
             self.l3[DNS].qdcount = pkt[DNS].qdcount
             self.l3[DNS].qd = pkt[DNS].qd
-            print str( self.jsonConfig['listeningAddress'] )
-            if (self.jsonConfig['listeningAddress'] == pkt[DNS].qd.qname[:-1]) :
+
+            if(self.DNS_lookup.has_key(pkt[DNS].qd.qname[:-1])) :
                 self.l3[DNS].ancount = 1
                 self.l3[DNS].an = DNSRR(rrname=self.l3[DNS].qd.qname, type='A', ttl=3600, rdata='192.168.1.6' )
             else:

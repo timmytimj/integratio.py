@@ -60,15 +60,26 @@ class Connector(Automaton):
 
     # check only matching incoming packets
     def master_filter(self, pkt):
-        if (self.localAddr != 0):
-            return  ( IP in pkt and TCP in pkt \
-                    and pkt[IP].dst == self.localAddr \
-                    and pkt[TCP].dport == self.localPort
-                    )
+        if(self.config['category'] != "dns"):
+            if (self.localAddr != 0):
+                return  ( IP in pkt and TCP in pkt \
+                        and pkt[IP].dst == self.localAddr \
+                        and pkt[TCP].dport == self.localPort
+                        )
+            else:
+                return  ( IP in pkt and TCP in pkt \
+                        and pkt[TCP].dport == self.localPort
+                        )
         else:
-            return  ( IP in pkt and TCP in pkt \
-                    and pkt[TCP].dport == self.localPort
-                    )
+            if (self.localAddr != 0):
+                return  ( IP in pkt and UDP in pkt \
+                        and pkt[IP].dst == self.localAddr \
+                        and pkt[UDP].dport == self.localPort
+                        )
+            else:
+                return  ( IP in pkt and UDP in pkt \
+                        and pkt[UDP].dport == self.localPort
+                        )
     
     # This is a tool method used to recognized if 'pkt'
     # is a retransmitted packet or not.
@@ -109,7 +120,7 @@ class Connector(Automaton):
     @ATMT.receive_condition(CON_LISTEN)
     def con_receive_syn(self, pkt):
         
-        if( 'S' in flags(pkt[TCP].flags) and not self.isRetransmit(pkt) ):
+        if( self.config['category'] != 'dns' and 'S' in flags(pkt[TCP].flags) and not self.isRetransmit(pkt) ):
             # tcz = TCZee(self.config, pkt, debug=3)
             # Check impact of DEBUG messages on performances
 
@@ -157,9 +168,19 @@ class Connector(Automaton):
                 tczThread = Thread(target=tcz.run, name='tcz_Thread_Packet')
                 tczThread.deamon = True
                 tczThread.start()
-                
+                    
             self.lastReceived = pkt
             self.connections.append(tcz)
+        elif self.config['category'] == 'dns':
+            # DNZee component for DNS look-up from browser 
+            # DNS is using UDP-only implementation for the time-being.
+            dnz = DNZee(self.config, self.localPort, debug=3)
+            dnzThread = Thread(target=dnz.run, name='DNS_Thread')
+            dnzThread.daemon = True
+
+            # Starting the TCZ Threads
+            dnzThread.start()             
+
             # TODO here we create a new instance of
             # HTTZee (that contains a TCZee).
             #
