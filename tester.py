@@ -1,5 +1,5 @@
 from scapy.all import *
-from lib.connector import Connector
+from libs.connector import Connector
 from scapy.all import Automaton
 from functools import wraps
 
@@ -40,6 +40,11 @@ class Tester(object):
                 self.currentTest = Connector(config, debug=3)
                 self.currentTest.run()
                 print "[packet] Test completed for %s"%(test_id)
+            elif ( config != {} and config['category'] == 'dns' ):
+                print "[packet] Test started for %s"%(test_id)
+                self.currentTest = Connector(config, debug=3)
+                self.currentTest.run()
+                print "[packet] Test completed for %s"%(test_id)
             else:
                 print "JSON Config file empty or no valid test category."
             
@@ -56,9 +61,9 @@ class ConfigExpert(object):
         jsonRegistry'''
         
         self.jsonCopy = copy.deepcopy(rawJson)
-        current_key=self.jsonCopy['testID']
+        current_key=self.jsonCopy['test-id']
         self.jsonRegistry[current_key]={}
-        del self.jsonCopy['testID']
+        del self.jsonCopy['test-id']
         self.jsonRegistry[current_key]=self.jsonCopy
 
         # TODO: the logic for the combining the multi-config file
