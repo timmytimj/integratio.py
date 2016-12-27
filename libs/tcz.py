@@ -107,7 +107,7 @@ class TCZee(Automaton):
     def confTCZ(self, port = 80, interface = 'eth0'):
         # burning and looting tonight
         self.localPort = port
-        self.interface = interface
+        self.interface = str(interface)
 
         # We are assuming here that IntegratioWebServer is listening on wlan0 interface
         try:
