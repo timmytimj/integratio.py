@@ -74,7 +74,7 @@ class DNZee(Automaton):
 
             if(self.DNS_lookup.has_key(pkt[DNS].qd.qname[:-1])) :
                 self.l3[DNS].ancount = 1
-                self.l3[DNS].an = DNSRR(rrname=self.l3[DNS].qd.qname, type='A', ttl=3600, rdata='192.168.1.6' )
+                self.l3[DNS].an = DNSRR(rrname=self.l3[DNS].qd.qname, type='A', ttl=3600,  rdata=self.DNS_lookup[pkt[DNS].qd.qname[:-1]])
             else:
                 self.l3[DNS].ancount = 0
                 self.l3[DNS].an = None
