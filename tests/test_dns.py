@@ -1,12 +1,16 @@
-# content of test_packet.py
+# content of test_dns.py
 
-# Just a reference while building the test case
+# Reference for building the test case
 # you must install the dnspython module to make 
 # dns querying from within the python code
+
+# Ref-Site fro dnspython lib: http://www.dnspython.org/
 
 import dns.resolver
 from dns.resolver import NXDOMAIN
 from dns.exception import DNSException
+
+
 import sys
 sys.path.append('../libs')
 from connector import Connector
@@ -40,7 +44,7 @@ confi = {
 my_IPaddress = get_my_IPaddress( confi['interface'] )
 
 @pytest.fixture
-def dns_found_1():
+def domain_found_1():
     con = Connector(confi, debug=3)
     con.runbg()
     myResolver = dns.resolver.Resolver()
@@ -51,7 +55,7 @@ def dns_found_1():
     con.stop()
 
 @pytest.fixture
-def dns_found_2():
+def domain_found_2():
     con = Connector(confi, debug=3)
     con.runbg()
     myResolver = dns.resolver.Resolver()
@@ -62,7 +66,7 @@ def dns_found_2():
     con.stop()
 
 @pytest.fixture
-def dns_not_found():
+def domain_not_found():
     con = Connector(confi, debug=3)
     con.runbg()
     yield con
@@ -71,13 +75,13 @@ def dns_not_found():
 # DNZ
 
 # This test case verifies the basic dns query for "dns" category
-def test_dns_found_1(dns_found_1):
-    assert  dns_found_1=="192.168.178.68"
+def test_domain_found_1(domain_found_1):
+    assert  domain_found_1=="192.168.178.68"
 
-def test_dns_found_2(dns_found_2):
-    assert  dns_found_2=="192.168.178.60"
+def test_domain_found_2(domain_found_2):
+    assert  domain_found_2=="192.168.178.60"
 
-def test_dns_not_found(dns_not_found):
+def test_domain_not_found(domain_not_found):
     myResolver = dns.resolver.Resolver()
     myResolver.nameservers = [my_IPaddress]
     try:
