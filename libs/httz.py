@@ -12,26 +12,38 @@ import threading
 import inspect
 from Queue import Queue
 
+class Resource(object):
+    def __init__(self, res="", status="", head="", body=""):
+        self.resource = res
+        self.httpstatus = status
+        self.headers = head
+        self.body = body
 
 class HTTZee(object):
-
-    def __init__(self, tcz):
-        # Threading stuff
+    # NOTE  NOT READY YET This method should be used later on to decouple the
+    #       Initialization of Resources from JSON.
+    #       Currently the HTTZee.resource is a key-value and not an array of Resource objects.
+    def addResource(self, resource):
+    #    if isinstance(resource, Resource):
+    #        self.resources.append(r)
+        pass
+    def __init__(self, tcz, jsonConf = {}):
+        # Internal list of resources
 
         # Adding a reference to the TCZ used as TCP stack
         self.tcz = tcz
 
         self.resources = {}
+        if "parameter" in jsonConf:
+            self.createHTTZ(jsonConf)
 
-        self.createHTTZ(tcz)
-
-    def createHTTZ(self, tczParam):
+    def createHTTZ(self, jsonConfig):
         body = "Example of Content category TestCase content."
         bodySize = body.__len__()
 
-        if(tczParam.jsonConfig != {} and tczParam.jsonConfig['resources'] != "" ):
+        if(jsonConfig != {} and jsonConfig['parameter'] != "" ):
 
-            for res in self.tcz.jsonConfig['resources']:
+            for res in jsonConfig['parameter']:
 
                 bodySize = res['body'].__len__()
 
@@ -40,11 +52,11 @@ class HTTZee(object):
                 #   add a mechanism to check if the header is presentinthe JSON and replace it with the
                 #   dinamically calculated value.
                 #   Check re module for regular expression (str.replace() does not understand regex)
+                status = res['http-status']
                 headers = res['headers']
                 headers = headers.rstrip()
                 headers += "\r\nContent-length: " + str(bodySize) + "\r\n\r\n"
-
-                self.resources[res['resource']] = str(headers + res['body'])
+                self.resources[res['resource']] = str(status + headers + res['body'])
 
         else:
             print "[ERROR] HTTZee initialized without correct JSON config file. No resources available."

@@ -143,7 +143,8 @@ class Connector(Automaton):
             elif self.config['category']=='content':
                 # Create TCZ and HTTZ Objects
                 tcz = TCZee(pkt, self.config, debug=3)
-                httz = HTTZee(tcz)
+                
+                httz = HTTZee(tcz, self.config)
 
                 # Prepare HTTZ Thread
                 httzThread = Thread(target=httz.run, name='httz_Thread_Content')

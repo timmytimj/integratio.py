@@ -13,31 +13,32 @@ import time
 config = {
     "testID" : "Content test case 1",\
     "category" : "content",\
-    "state" :"LISTEN",\
-    "parameter" : 6,\
-    "listeningPort" : 80,\
-    "listeningAddress" : "testing.com",\
-    "listeningInterface" : "eth0",\
-    "resources" :   [\
+    "lis-port" : 80,\
+    "interface" : "eth0",\
+    "parameter" :   [\
                 {\
                     "resource"  : "/",\
                     "body"      : "Response for the main resource /",\
-                    "headers"   : "HTTP/1.1 200 OK\r\nConnection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
+                    "http-status" : "HTTP/1.1 200 OK\r\n",\
+                    "headers"   : "Connection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
                 },\
                 {\
                                         "resource"      : "/500",\
+                                        "http-status" : "HTTP/1.1 500 Internal Server Error\r\n",\
                                         "body"          : "Response for the 500 error",\
-                                        "headers"       : "HTTP/1.1 500 Internal server error\r\nConnection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
+                                        "headers"       : "Connection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
                                 },\
                 {\
                                         "resource"      : "/404",\
+                                        "http-status" : "HTTP/1.1 404 Not Found\r\n",\
                                         "body"          : "Response for the 404 error",\
-                                        "headers"       : "HTTP/1.1 404 Resource not found\r\nConnection: close\r\nDate: Mon, 28 Nov 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
+                                        "headers"       : "Connection: close\r\nDate: Mon, 28 Nov 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
                                 },\
                 {\
                                         "resource"      : "/favicon.ico",\
+                                        "http-status" : "HTTP/1.1 200 OK\r\n",\
                                         "body"      : "FavICO",\
-                                        "headers"       : "HTTP/1.1 200 OK\r\nConnection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
+                                        "headers"       : "Connection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
                                 }\
             ]\
 }
