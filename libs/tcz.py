@@ -616,4 +616,4 @@ class TCZee(Automaton):
 
     @ATMT.state(final=1)
     def END(self):
-        pass
+        self.stop()
