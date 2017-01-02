@@ -1,4 +1,4 @@
-# content of test_delay.py
+# content of test_content.py
 
 import sys
 sys.path.append('../libs')

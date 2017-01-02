@@ -14,16 +14,18 @@ import socket
 
 
 config = {\
-    "testID" : "Delay01",\
+    "test-id" : "Delay01",\
     "category" : "time",\
-    "state" :"LISTEN",\
-    "parameter" : 6,\
-    "listeningPort" : 52413,\
-    "listeningAddress" : "testing.com",\
-    "listeningInterface" : "eth0"\
+    "lis-port" : 52413,\
+    "interface" : "eth0",\
+    "parameter" : [{\
+        "state" : "LISTEN",\
+        "action" : "LISTEN",\
+        "delay" : 6\
+    }]\
 }
 
-my_IPaddress = get_my_IPaddress('eth0')
+my_IPaddress = get_my_IPaddress( config['interface'] )
 
 def connect( time = 3, server_address = (my_IPaddress, 80) ):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
