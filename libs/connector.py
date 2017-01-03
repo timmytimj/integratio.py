@@ -19,19 +19,24 @@ from threading import Thread
 
 class Connector(Automaton):
 
-    def parse_args(self, jsonConfig={}, **kargs):
-        Automaton.parse_args(self, **kargs)
-        self.config = jsonConfig
-        self.lastReceived = ""
-        
+    def jsonConfig(self, conf = {}):
+        self.config = conf
+
         # Legacy JSON format, keep it for the moment until 
         # migration to JSON-schema is completed
         if 'listeningPort' in self.config:
             self.localPort = int( self.config['listeningPort'] )
-        elif 'lis-port' in self.config:
-            self.localPort = int( self.config['lis-port'] )
+        elif 'tcp-port' in self.config:
+            self.localPort = int( self.config['tcp-port'] )
         else:
             self.localPort = 80
+
+        if 'dns-port' in self.config:
+            self.dnsPort = self.config['dns-port']
+            # [MZ 03.01.2016] TODO for BD: please add here the code to configure the DNZee based 
+            #                      on the content of the JSON paramters. I do not want to pass the 
+            #                      full JSON to DNZee, we should have method calls to add entries to
+            #                      DNZee internal list of "q-addr"/"response" pairs
 
         # Legacy JSON format, keep it for the moment until 
         # migration to JSON-schema is completed
@@ -41,9 +46,18 @@ class Connector(Automaton):
         elif 'interface' in self.config:
             self.interface = str( self.config['interface'] )
         else:
-            self.interface = "wlan0"
+            self.interface = "eth0"
 
-        # We are assuming here that IntegratioWebServer is listening on wlan0 interface
+
+    def parse_args(self, jsonConfig={}, **kargs):
+        Automaton.parse_args(self, **kargs)
+        self.lastReceived = ""
+        
+        self.localPort = -1
+        self.dnsPort = -1
+       
+        self.jsonConfig(jsonConfig)
+ 
         try:
             # TODO  This step define on which interface (and so IP address) the TCZ will listen
             #       to. Should not be hardcoded but should be part of the JSON configuration
@@ -52,7 +66,7 @@ class Connector(Automaton):
             print "MyIP address: " + str(self.localAddr)
         except IOError:
             self.localAddr = 0
-            print "\t[WARNING] 'wlan0' interface not available"
+            print "\t[WARNING] '" + self.interface + "' interface not available"
             print "not possible to get local IP address for master filter."
             pass
 
@@ -60,26 +74,15 @@ class Connector(Automaton):
 
     # check only matching incoming packets
     def master_filter(self, pkt):
-        if(self.config['category'] != "dns"):
-            if (self.localAddr != 0):
-                return  ( IP in pkt and TCP in pkt \
-                        and pkt[IP].dst == self.localAddr \
-                        and pkt[TCP].dport == self.localPort
-                        )
-            else:
-                return  ( IP in pkt and TCP in pkt \
-                        and pkt[TCP].dport == self.localPort
-                        )
+        if (self.localAddr != 0):
+            return  ( IP in pkt and TCP in pkt \
+                    and pkt[IP].dst == self.localAddr \
+                    and pkt[TCP].dport == self.localPort
+                    )
         else:
-            if (self.localAddr != 0):
-                return  ( IP in pkt and UDP in pkt \
-                        and pkt[IP].dst == self.localAddr \
-                        and pkt[UDP].dport == self.localPort
-                        )
-            else:
-                return  ( IP in pkt and UDP in pkt \
-                        and pkt[UDP].dport == self.localPort
-                        )
+            return  ( IP in pkt and TCP in pkt \
+                    and pkt[TCP].dport == self.localPort
+                    )
     
     # This is a tool method used to recognized if 'pkt'
     # is a retransmitted packet or not.
@@ -109,8 +112,6 @@ class Connector(Automaton):
     # BEGIN state
     @ATMT.state(initial=1)
     def CON_BEGIN(self):
-        # DNZee component for DNS look-up from browser 
-        # DNS is using UDP-only implementation for the time-being.
         raise self.CON_LISTEN()
 
     @ATMT.state()
@@ -120,67 +121,72 @@ class Connector(Automaton):
     @ATMT.receive_condition(CON_LISTEN)
     def con_receive_syn(self, pkt):
         
-        if( self.config['category'] != 'dns' and 'S' in flags(pkt[TCP].flags) and not self.isRetransmit(pkt) ):
-            # tcz = TCZee(self.config, pkt, debug=3)
-            # Check impact of DEBUG messages on performances
+        if( 'S' in flags(pkt[TCP].flags) and not self.isRetransmit(pkt) ): 
+            # create a model for TCZ, with no pkt and no configuration
+            self.tcz = TCZee(pkt, {}, debug=3)
+            self.tcz.confTCZ(self.localPort, self.interface)
+            conf = self.config
 
-            # BD: issue#17: For creating a dummy Httz for time category
-            # cases. status_http parameter is passed to HTTZee class.
-            # status_http = 0 means dummy httz component used for time.
-            # status_http = 1 means proper httz component used for content.
-            if self.config['category']=='time':
-                # MZ 26.12.2016 JSON is used again, but in a separate TCZee method TCZee.jsonConf()
-                # This method works with JSON-schema defined JSON config
-                tcz = TCZee(pkt, self.config, debug=3)
-
-                # BD: removed the threading in my current testing
-                tczThread = Thread(target=tcz.run, name='tcz_Thread_time')
-                tczThread.daemon = True
-
-                # Starting the TCZ Threads
-                tczThread.start()
-
-            elif self.config['category']=='content':
-                # Create TCZ and HTTZ Objects
-                tcz = TCZee(pkt, self.config, debug=3)
-                
-                httz = HTTZee(tcz, self.config)
-
-                # Prepare HTTZ Thread
-                httzThread = Thread(target=httz.run, name='httz_Thread_Content')
+            contentFlag = False
+            
+            print ">>>[remove] about to check the JSON" 
+            if 'configs' in conf:
+                print ">>>[remove] configs is there, about to iterate"
+                for c in conf['configs']:
+                    print ">>>[remove] there is at least one item in configs"
+                    # TIME #
+                    if c['category'] == 'time':
+                        print ">>>[remove] this item is a time category"
+                        # Iterate on Delay parameters
+                        for p in c['parameters']:
+                            print ">>>[remove] param for this time cat: " + str(p['state']) + ", " + str(p['action']) + ", " + str(p['delay']) 
+                            cd = confDelay( p['state'], p['action'], p['delay'] )
+                            self.tcz.addDelayConf(cd)
+                    # PACKET #
+                    elif c['category'] == 'packet':
+                        print ">>>[remove] packet category"
+                        for p in c['parameters']:
+                            print ">>>[remove][packet] at least one parameter here"
+                            if p['sub-category'] == 'tcz':
+                                print ">>>[remove][packet] TCZ"
+                                cp = confTCZ( p['state'], p['action'], p['flags'] )
+                                self.tcz.addPacketConf(cp)
+                            elif p['sub-category'] == 'icmz':
+                                print ">>>[remove][packet] ICMZ"
+                                cp = confICMZ( p['state'], p['action'], p['type'], p['code'] )
+                                self.tcz.addPacketConf(cp)
+                    # CONTENT #
+                    elif c['category'] == 'content':
+                        print ">>>[remove][content] at least one category content"
+                        self.httz = HTTZee(self.tcz)
+                        contentFlag = True
+                        for p in c['parameters']:
+                            print ">>>[remove][content] Loading resource: " + str(p['resource'])
+                            self.httz.addResource(p['resource'], p['http-status'], p['headers'], p['body'])
+    
+            if(contentFlag):
+                httzThread = Thread(target=self.httz.run, name='httz-thread')
+                tczThread = Thread(target=self.httz.connection, name='httz-tcz-thread')
                 httzThread.daemon = True
-
-                # Prepare a separate thread for the TCZee run
-                tczThread = Thread(target=httz.connection, name='tcz_Thread_Content')
-
-                # Starting the respective Threads
-                tczThread.start()
                 httzThread.start()
-
-            elif self.config['category'] == 'packet':
-                # MZ 26.12.2016 Same as for the time category above
-                # NOTE  We still pass JSON configuration from Connector to TCZ, but the TCZee.jsonConf() 
-                # method is now able to distinguish between 'packet' and 'delay' configuration, so the code here
-                # and at line 122 can be the same.
-                # Before consolidate 'time' and 'packet' in a single 'if branch', we need to discuss how DNS use
-                # cases fit in this logic.
-                tcz = TCZee( pkt, self.config, debug=3)
-
-                tczThread = Thread(target=tcz.run, name='tcz_Thread_Packet')
+                tczThread.start()
+            else:
+                tczThread = Thread(target=self.tcz.run, name='tcz_Thread_Packet')
                 tczThread.deamon = True
                 tczThread.start()
                     
-            self.lastReceived = pkt
-            self.connections.append(tcz)
-        elif self.config['category'] == 'dns':
+        self.lastReceived = pkt
+        self.connections.append(self.tcz)
+
+        #elif self.config['category'] == 'dns':
             # DNZee component for DNS look-up from browser 
             # DNS is using UDP-only implementation for the time-being.
-            dnz = DNZee(self.config, self.localPort, debug=3)
-            dnzThread = Thread(target=dnz.run, name='DNS_Thread')
-            dnzThread.daemon = True
+            #dnz = DNZee(self.config, self.localPort, debug=3)
+            #dnzThread = Thread(target=dnz.run, name='DNS_Thread')
+            #dnzThread.daemon = True
 
             # Starting the TCZ Threads
-            dnzThread.start()             
+            #dnzThread.start()             
 
             # TODO here we create a new instance of
             # HTTZee (that contains a TCZee).

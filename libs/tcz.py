@@ -131,20 +131,26 @@ class TCZee(Automaton):
         if isinstance(tp, confTCZ) or isinstance(tp, confICMZ):
             self.tPackets.append(tp)
 
-    def parse_args(self, pkt = IP(), jsonConfig = {},  **kargs):
+    def setInitialPacket(self, pkt = False):
+        if IP in pkt:
+            self.initSYN = pkt
+            self.remotePort = self.initSYN[TCP].sport
+            self.remoteAddr = self.initSYN[IP].src
+
+    def parse_args(self, pkt = False, jsonConfig = {},  **kargs):
         
-        #print "[DEBUG] Starting processing parameters"
+        print "[DEBUG] Starting processing parameters"
         Automaton.parse_args(self, **kargs)
-        self.initSYN = pkt
         
-        self.remotePort = self.initSYN[TCP].sport
-        self.remoteAddr = self.initSYN[IP].src
+        if (IP in pkt):
+            self.setInitialPacket(pkt)
 
         self.tDelays = []
         self.tPackets = []
 
         self.curAck = 0
         self.curSeq = 0
+        
 
         # recv and send buffer to be used by the external     httz component
         self.recv = Queue()
@@ -161,18 +167,15 @@ class TCZee(Automaton):
     # but only 1 per TCZee instance. So the master filter should only
     # get the TCP packets from this stream.
     def master_filter(self, pkt):
-        if self.localAddr == 0:
-            # print "myIp is not defined"
-            return  ( IP in pkt and TCP in pkt \
-                and pkt[TCP].dport == self.localPort \
-                        and pkt[TCP].sport == self.remotePort
-                )
-        else:
+        
+        if self.localAddr != 0 and self.remotePort != 0 and self.localPort != 0:
             return  ( IP in pkt and TCP in pkt \
                 and pkt[IP].dst == self.localAddr \
                 and pkt[TCP].dport == self.localPort \
-                        and pkt[TCP].sport == self.remotePort
+                and pkt[TCP].sport == self.remotePort
                 )
+        else:
+            return ()
 
     # Definition of the method to access the recv buffer
     # this is intented to be called by the httz component
@@ -209,13 +212,14 @@ class TCZee(Automaton):
     def send(self, pkt):
         curframe = inspect.currentframe()
         calframe = inspect.getouterframes(curframe, 1)
-        print "\t\t[NEW DEBUG] Caller frame: ", calframe[1][3]+ "-- current Thread --" + (threading.current_thread().name) + ", ID -- "+ str(threading.current_thread().ident)+"\n"
+        print "\t\t[NEW DEBUG] Action: ", calframe[1][3]+ "-- current Thread --" + (threading.current_thread().name) + ", ID -- "+ str(threading.current_thread().ident)+"\n"
 
         # Check for time tests
         fd = isTestRelevant(self.tDelays, self.state.state, calframe[1][3])
         fp = isTestRelevant(self.tPackets, self.state.state, calframe[1][3])
 
         if isinstance(fd, confDelay):
+            print "[DEBUG][time category], about to sleep for " + str(fd.time) + " seconds"
             time.sleep(fd.time)
 
         if isinstance(fp, confTCZ): 
@@ -373,7 +377,6 @@ class TCZee(Automaton):
 
             self.lastReceived = pkt.copy()
 
-#
     @ATMT.state(initial=1)
     def BEGIN(self):
 #        pass

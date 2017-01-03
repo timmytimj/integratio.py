@@ -20,13 +20,15 @@ class Resource(object):
         self.body = body
 
 class HTTZee(object):
-    # NOTE  NOT READY YET This method should be used later on to decouple the
-    #       Initialization of Resources from JSON.
-    #       Currently the HTTZee.resource is a key-value and not an array of Resource objects.
-    def addResource(self, resource):
-    #    if isinstance(resource, Resource):
-    #        self.resources.append(r)
-        pass
+    # TODO we should use the Resource object here, or not defining at all
+    def addResource(self, res, status, headers, body):
+        if res != "":
+            bodySize = body.__len__()
+            headers = headers.rstrip()
+            headers += "\r\nContent-length: " + str(bodySize) + "\r\n\r\n"
+            self.resources[res] = str(status + headers + body)
+        
+
     def __init__(self, tcz, jsonConf = {}):
         # Internal list of resources
 
@@ -65,8 +67,11 @@ class HTTZee(object):
     def connection(self):
         print "\t[HTTZ][connection()] Starting TCZee thread  -- current Thread --%s"%(threading.current_thread().name)
         self.tcz.run()
+        #pass
 
     def run(self):
+        #print "\t[HTTZ][connection()] Starting TCZee thread  -- current Thread --%s"%(threading.current_thread().name)
+        #self.tcz.run()
         s = ""
         print "\t[HTTZ][run()] called TCZee.run(), entering infinite loop now.-- current Thread --%s"%(threading.current_thread().name)
         while ( s != "exit" ):
