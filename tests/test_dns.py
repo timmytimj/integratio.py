@@ -24,24 +24,71 @@ import socket
 import errno
 import IN
 
-confi = {
-    "test-id"  : "dns001",\
-    "interface": "lo",\
-    "lis-port" : 53,\
-    "category" : "dns",\
-    "parameter": [\
+confi = {\
+    "test-id"   : "General test 1",\
+    "interface" : "lo",\
+    "tcp-port"  : 80,\
+    "dns-port"  : 53,\
+    "configs"     : [\
         {\
-            "q-addr" : "www.google.com",\
-            "response": "192.168.178.60"\
+            "category"  : "time",\
+            "parameters": [\
+                {\
+                    "state"     : "BEGIN",\
+                    "action"    : "BEGIN",\
+                    "delay"     : 6\
+                }\
+            ]\
         },\
         {\
-            "q-addr" : "www.test.com",\
-            "response": "192.168.178.68"\
+            "category"  : "packet",\
+            "parameters": [\
+                {\
+                    "sub-category" : "tcz",\
+                    "state"     : "ESTABLISHED",\
+                    "action"    : "send_finAck",\
+                    "flags"     : "RP"\
+                }\
+            ]\
+        },\
+        {\
+            "category"  : "content",\
+            "parameters":[\
+                {\
+                    "resource" : "/index.html",\
+                    "http-status": "200 OK",\
+                    "headers" : "Server: john.com\r\nDate: 2016-12-22 17:55\r\n\r\n",\
+                    "body" : "Example of correct HTTP response"\
+                },\
+                {\
+                    "resource" : "/404error.html",\
+                    "http-status": "404 Not Found",\
+                    "headers" : "Server: john.com\r\nDate: 2016-12-22 17:55\r\n\r\n",\
+                    "body" : "Example of correct HTTP response"\
+                }\
+            ]\
+        },\
+        {\
+            "category"  : "dns",\
+            "parameters": [\
+                {\
+                    "q-addr" : "www.google.com",\
+                    "response": "192.168.178.60"\
+                },\
+                {\
+                    "q-addr" : "www.test.com",\
+                    "response": "192.168.178.68"\
+                }\
+            ]\
         }\
     ]\
 }
 
 my_IPaddress = get_my_IPaddress( confi['interface'] )
+
+# introduced to avoid the concurrency issue between pytest.fixtures
+# TODO:Fix this more elegantly. due increased size of json confi
+time.sleep(3)
 
 @pytest.fixture
 def domain_found_1():
