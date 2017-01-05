@@ -19,12 +19,12 @@ config = {\
                 {
                     "state"     : "ESTABLISHED",
                     "action"    : "sendAck",
-                    "delay"     : 1
+                    "delay"     : 0.1
                 },
                 {
                     "state"     : "ESTABLISHED",
                     "action"    : "send_response",
-                    "delay"     : 1
+                    "delay"     : 0.1
                 }
             ]
         },

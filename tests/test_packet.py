@@ -47,7 +47,7 @@ my_IPaddress = get_my_IPaddress( confi['interface'] )
 def send( server_address = (my_IPaddress, 80) ):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.setsockopt( socket.IPPROTO_IP, IN.IP_RECVERR, 1 )
-    sock.settimeout(5)
+    sock.settimeout(7)
     sock.connect(server_address)
     sock.send("Ciao caro")
     time.sleep(1)
