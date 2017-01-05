@@ -8,71 +8,29 @@ from libs.connector import Connector
 
 log_interactive.setLevel(1)
 
-jconfig = config = {\
-    "test-id"   : "General test 1",\
-    "interface" : "eth0",\
-    "tcp-port"  : 80,\
-    "dns-port"  : 53,\
-    "configs"     : [\
-        {\
-            "category"  : "time",\
-            "parameters": [\
+jconfig = {
+    "test-id"   : "General test 1",
+    "interface" : "eth0",
+    "tcp-port"  : 80,
+    "configs"     : [
+        {
+            "category" : "content",
+            "parameters": [
+                {
+                    "resource"  : "/delay.html",
+                    "http-status" : "HTTP/1.1 200 OK\r\n",
+                    "body"      : "This is a delayed, valid HTTP response.",
+                    "headers"   : "Connection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"
+                },
                 {\
-                    "state"     : "BEGIN",\
-                    "action"    : "BEGIN",\
-                    "delay"     : 6\
-                }\
-            ]\
-        },\
-        {\
-            "category"  : "packet",\
-            "parameters": [\
-                {\
-                    "sub-category" : "tcz",\
-                    "state"     : "ESTABLISHED",\
-                    "action"    : "send_finAck",\
-                    "flags"     : "RP"\
-                }\
-#                {\
-#                    "sub-category" : "icmz",\
-#                    "state"     : "ESTABLISHED",\
-#                    "action"    : "sendAck",\
-#                    "type"      : 3,\
-#                    "code"      : 2\
-#                }\
-            ]\
-        },\
-        {\
-            "category"  : "content",\
-            "parameters":[\
-                {\
-                    "resource" : "/index.html",\
-                    "http-status": "200 OK",\
-                    "headers" : "Server: john.com\r\nDate: 2016-12-22 17:55\r\n\r\n",\
-                    "body" : "Example of correct HTTP response"\
-                },\
-                {\
-                    "resource" : "/404error.html",\
-                    "http-status": "404 Not Found",\
-                    "headers" : "Server: john.com\r\nDate: 2016-12-22 17:55\r\n\r\n",\
-                    "body" : "Example of correct HTTP response"\
-                }\
-            ]\
-        },\
-        {\
-            "category"  : "dns",\
-            "parameters": [\
-                {\
-                    "q-addr" : "www.google.com",\
-                    "response": "192.168.178.60"\
-                },\
-                {\
-                    "q-addr" : "www.test.com",\
-                    "response": "192.168.178.60"\
-                }\
-            ]\
-        }\
-    ]\
+                    "resource"    : "/",\
+                    "http-status" : "HTTP/1.1 200 OK\r\n",\
+                    "body"        : "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",\
+                    "headers"     : "Connection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
+                }
+            ]
+        }
+    ]
 }
 
 c = Connector(jconfig, debug=3)

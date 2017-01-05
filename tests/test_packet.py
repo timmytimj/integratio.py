@@ -24,20 +24,24 @@ import errno
 import IN
 
 confi = {
-    "test-id"  : "p-tcz001",\
-    "interface": "eth0",\
-    "lis-port" : 80,\
-    "category" : "packet",\
-    "sub-category" : "tcz",\
-    "parameter": [\
-        {\
-            "state" : "ESTABLISHED",\
-            "action": "sendAck",\
-            "flags" : "RP"\
-        }\
-    ]\
+    "test-id"   : "General test 1",
+    "interface" : "eth0",
+    "tcp-port"  : 80,
+    "configs"     : [
+        {
+            "category"  : "packet",
+            "parameters": [
+                {
+                    "sub-category" : "tcz",
+                    "state"     : "ESTABLISHED",
+                    "action"    : "sendAck",
+                    "flags"     : "RPA"
+                }
+            ]
+        }
+    ]
 }
-
+ 
 my_IPaddress = get_my_IPaddress( confi['interface'] )
 
 def send( server_address = (my_IPaddress, 80) ):
@@ -58,9 +62,9 @@ def runConnector():
 
 @pytest.fixture
 def runConnectorRefused():
-    confi['parameter'][0]['state'] = 'BEGIN'
-    confi['parameter'][0]['action'] = 'BEGIN'
-    confi['parameter'][0]['flags'] = 'RPA'
+    confi['configs'][0]['parameters'][0]['state'] = 'BEGIN'
+    confi['configs'][0]['parameters'][0]['action'] = 'BEGIN'
+    confi['configs'][0]['parameters'][0]['flags'] = 'RPA'
     con = Connector(confi, debug=3)
     con.runbg()
     yield  con
@@ -68,11 +72,11 @@ def runConnectorRefused():
 
 @pytest.fixture
 def runConnectorEHOSTUNREACH():
-    confi['sub-category'] = 'icmz'
-    confi['parameter'][0]['state'] = 'ESTABLISHED'
-    confi['parameter'][0]['action'] = 'sendAck'
-    confi['parameter'][0]['type'] = 3
-    confi['parameter'][0]['code'] = 1
+    confi['configs'][0]['parameters'][0]['sub-category'] = 'icmz'
+    confi['configs'][0]['parameters'][0]['state'] = 'ESTABLISHED'
+    confi['configs'][0]['parameters'][0]['action'] = 'sendAck'
+    confi['configs'][0]['parameters'][0]['type'] = 3
+    confi['configs'][0]['parameters'][0]['code'] = 1
     con = Connector(confi, debug=3)
     con.runbg()
     yield  con
@@ -80,11 +84,11 @@ def runConnectorEHOSTUNREACH():
 
 @pytest.fixture
 def runConnectorENOPROTOOPT():
-    confi['sub-category'] = 'icmz'
-    confi['parameter'][0]['state'] = 'ESTABLISHED'
-    confi['parameter'][0]['action'] = 'sendAck'
-    confi['parameter'][0]['type'] = 3
-    confi['parameter'][0]['code'] = 2
+    confi['configs'][0]['parameters'][0]['sub-category'] = 'icmz'
+    confi['configs'][0]['parameters'][0]['state'] = 'ESTABLISHED'
+    confi['configs'][0]['parameters'][0]['action'] = 'sendAck'
+    confi['configs'][0]['parameters'][0]['type'] = 3
+    confi['configs'][0]['parameters'][0]['code'] = 2
     con = Connector(confi, debug=3)
     con.runbg()
     yield  con
@@ -92,11 +96,11 @@ def runConnectorENOPROTOOPT():
 
 @pytest.fixture
 def runConnectorECONNREFUSED():
-    confi['sub-category'] = 'icmz'
-    confi['parameter'][0]['state'] = 'ESTABLISHED'
-    confi['parameter'][0]['action'] = 'sendAck'
-    confi['parameter'][0]['type'] = 3
-    confi['parameter'][0]['code'] = 3
+    confi['configs'][0]['parameters'][0]['sub-category'] = 'icmz'
+    confi['configs'][0]['parameters'][0]['state'] = 'ESTABLISHED'
+    confi['configs'][0]['parameters'][0]['action'] = 'sendAck'
+    confi['configs'][0]['parameters'][0]['type'] = 3
+    confi['configs'][0]['parameters'][0]['code'] = 3    
     con = Connector(confi, debug=3)
     con.runbg()
     yield  con
@@ -104,11 +108,11 @@ def runConnectorECONNREFUSED():
 
 @pytest.fixture
 def runConnectorENOTSUP():
-    confi['sub-category'] = 'icmz'
-    confi['parameter'][0]['state'] = 'ESTABLISHED'
-    confi['parameter'][0]['action'] = 'sendAck'
-    confi['parameter'][0]['type'] = 3
-    confi['parameter'][0]['code'] = 5
+    confi['configs'][0]['parameters'][0]['sub-category'] = 'icmz'
+    confi['configs'][0]['parameters'][0]['state'] = 'ESTABLISHED'
+    confi['configs'][0]['parameters'][0]['action'] = 'sendAck'
+    confi['configs'][0]['parameters'][0]['type'] = 3
+    confi['configs'][0]['parameters'][0]['code'] = 5
     con = Connector(confi, debug=3)
     con.runbg()
     yield  con
@@ -116,11 +120,11 @@ def runConnectorENOTSUP():
 
 @pytest.fixture
 def runConnectorENETUNREACH():
-    confi['sub-category'] = 'icmz'
-    confi['parameter'][0]['state'] = 'ESTABLISHED'
-    confi['parameter'][0]['action'] = 'sendAck'
-    confi['parameter'][0]['type'] = 3
-    confi['parameter'][0]['code'] = 6
+    confi['configs'][0]['parameters'][0]['sub-category'] = 'icmz'
+    confi['configs'][0]['parameters'][0]['state'] = 'ESTABLISHED'
+    confi['configs'][0]['parameters'][0]['action'] = 'sendAck'
+    confi['configs'][0]['parameters'][0]['type'] = 3
+    confi['configs'][0]['parameters'][0]['code'] = 6
     con = Connector(confi, debug=3)
     con.runbg()
     yield  con
@@ -128,11 +132,11 @@ def runConnectorENETUNREACH():
 
 @pytest.fixture
 def runConnectorEHOSTDOWN():
-    confi['sub-category'] = 'icmz'
-    confi['parameter'][0]['state'] = 'ESTABLISHED'
-    confi['parameter'][0]['action'] = 'sendAck'
-    confi['parameter'][0]['type'] = 3
-    confi['parameter'][0]['code'] = 7
+    confi['configs'][0]['parameters'][0]['sub-category'] = 'icmz'
+    confi['configs'][0]['parameters'][0]['state'] = 'ESTABLISHED'
+    confi['configs'][0]['parameters'][0]['action'] = 'sendAck'
+    confi['configs'][0]['parameters'][0]['type'] = 3
+    confi['configs'][0]['parameters'][0]['code'] = 7
     con = Connector(confi, debug=3)
     con.runbg()
     yield  con
@@ -140,11 +144,11 @@ def runConnectorEHOSTDOWN():
 
 @pytest.fixture
 def runConnectorENONET():
-    confi['sub-category'] = 'icmz'
-    confi['parameter'][0]['state'] = 'ESTABLISHED'
-    confi['parameter'][0]['action'] = 'sendAck'
-    confi['parameter'][0]['type'] = 3
-    confi['parameter'][0]['code'] = 8
+    confi['configs'][0]['parameters'][0]['sub-category'] = 'icmz'
+    confi['configs'][0]['parameters'][0]['state'] = 'ESTABLISHED'
+    confi['configs'][0]['parameters'][0]['action'] = 'sendAck'
+    confi['configs'][0]['parameters'][0]['type'] = 3
+    confi['configs'][0]['parameters'][0]['code'] = 8
     con = Connector(confi, debug=3)
     con.runbg()
     yield  con

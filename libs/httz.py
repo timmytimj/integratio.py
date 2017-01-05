@@ -94,6 +94,7 @@ class HTTZee(object):
         for p in req.split():
                         # print "\t[HTTZ] spliting request:" + p
             if (p in self.resources.keys() ):
+                #self.tcz.pendingSend = True
                 print "\t[HTTZ][processRequest] Matching resource, sending response: " + self.resources[p]+ " -- current Thread --" + (threading.current_thread().name) +"\n"
                 self.tcz.write(self.resources[p])
                                 # Added by bdesikan on 18-Sep-16 during debug session
@@ -101,6 +102,9 @@ class HTTZee(object):
                                 # due to synchronization issue between the TCZ and HTTZ components.
                                 #TODO: Fix using robust approah
                                 # time.sleep(1)
+                
+                # TODO  Need to synch the send_response with the sendAck: in case of 'time' config and delay
+                #       on the send_response, the sendAck will provide the response first.
                 self.tcz.send_response()
 
         #return self.resources[req]

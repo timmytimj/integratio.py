@@ -139,9 +139,9 @@ class TCZee(Automaton):
 
     def parse_args(self, pkt = False, jsonConfig = {},  **kargs):
         
-        print "[DEBUG] Starting processing parameters"
         Automaton.parse_args(self, **kargs)
-        
+        self.pendingSend = False
+ 
         if (IP in pkt):
             self.setInitialPacket(pkt)
 
@@ -260,6 +260,8 @@ class TCZee(Automaton):
                 self.l3[TCP].ack = self.curAck
 
                 self.last_packet = self.l3
+                
+                print ">>>[remove][tcz.send_response()] About to call send() from Thread [" + threading.current_thread().name + "]"
                 self.send(self.last_packet)
                 self.last_packet[TCP].payload = None
                 # TODO  Here I am 'hardcoding' the update of the local SEQ number,
@@ -561,9 +563,9 @@ class TCZee(Automaton):
 
     @ATMT.action(receive_pshAck)
     def sendAck(self):
-        self.l3[TCP].flags = 'A'
-        self.last_packet = self.l3
-        self.send(self.last_packet)
+            self.l3[TCP].flags = 'A'
+            self.last_packet = self.l3
+            self.send(self.last_packet)
 
     # in ESTABLISHED recv() a SYN (basically client want to start a new tcp stream)
 

@@ -10,38 +10,42 @@ import io
 import json
 import time
 
-config = {
-    "testID" : "Content test case 1",\
-    "category" : "content",\
-    "lis-port" : 80,\
+config = {\
+    "test-id"   : "General test 1",\
     "interface" : "eth0",\
-    "parameter" :   [\
+    "tcp-port"  : 80,\
+    "configs"     : [\
+        {\
+            "category"  : "content",\
+            "parameters": [\
                 {\
-                    "resource"  : "/",\
-                    "body"      : "Response for the main resource /",\
-                    "http-status" : "HTTP/1.1 200 OK\r\n",\
-                    "headers"   : "Connection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
+                        "resource"  : "/",\
+                        "http-status" : "HTTP/1.1 200 OK\r\n",\
+                        "body"      : "Response for the main resource /",\
+                        "headers"   : "Connection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
                 },\
                 {\
-                                        "resource"      : "/500",\
-                                        "http-status" : "HTTP/1.1 500 Internal Server Error\r\n",\
-                                        "body"          : "Response for the 500 error",\
-                                        "headers"       : "Connection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
-                                },\
+                        "resource"      : "/500",\
+                        "http-status"   : "HTTP/1.1 500 Internal Server error\r\n",\
+                        "body"          : "Response for the 500 error",\
+                        "headers"       : "Connection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
+                },\
                 {\
-                                        "resource"      : "/404",\
-                                        "http-status" : "HTTP/1.1 404 Not Found\r\n",\
-                                        "body"          : "Response for the 404 error",\
-                                        "headers"       : "Connection: close\r\nDate: Mon, 28 Nov 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
-                                },\
+                        "resource"      : "/404",\
+                        "body"          : "Response for the 404 error",\
+                        "http-status" : "HTTP/1.1 404 Resource Not Found\r\n",\
+                        "headers"       : "Connection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
+                },\
                 {\
-                                        "resource"      : "/favicon.ico",\
-                                        "http-status" : "HTTP/1.1 200 OK\r\n",\
-                                        "body"      : "FavICO",\
-                                        "headers"       : "Connection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
-                                }\
+                        "resource"      : "/favicon.ico",\
+                        "http-status"   : "HTTP/1.1 200 OK\r\n",\
+                        "body"          : "FavICO",\
+                        "headers"       : "Connection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
+                }\
             ]\
-}
+        }\
+    ]\
+} 
 
 
 
@@ -75,7 +79,7 @@ def test_multiConnections(makeRequestMultiConnections):
     # Asserting the response for resource "/404"
     assert makeRequestMultiConnections[1].status_code == 404
     assert makeRequestMultiConnections[1].content == "Response for the 404 error"
-    assert makeRequestMultiConnections[1].headers == {'Date': 'Mon, 28 Nov 2016 18:51:19 GMT', 'Connection': 'close', 'Content-length': '26', 'Server': 'Apache/2.4.10 (Unix)'}
+    assert makeRequestMultiConnections[1].headers == {'Date': 'Sat, 27 Aug 2016 18:51:19 GMT', 'Connection': 'close', 'Content-length': '26', 'Server': 'Apache/2.4.10 (Unix)'}
 
     # Asserting the response for resource "/favicon.ico"
     assert makeRequestMultiConnections[2].status_code == 200

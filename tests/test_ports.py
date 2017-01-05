@@ -13,17 +13,24 @@ import time
 import socket
 
 
-config = {\
-    "test-id" : "Delay01",\
-    "category" : "time",\
-    "lis-port" : 52413,\
-    "interface" : "eth0",\
-    "parameter" : [{\
-        "state" : "LISTEN",\
-        "action" : "LISTEN",\
-        "delay" : 6\
-    }]\
+config = {
+    "test-id"   : "General test 1",
+    "interface" : "eth0",
+    "tcp-port"  : 52413,
+    "configs"     : [
+        {
+            "category"  : "time",
+            "parameters": [
+                {
+                    "state"     : "LISTEN",
+                    "action"    : "LISTEN",
+                    "delay"     : 6
+                }
+            ]
+        }
+    ]
 }
+
 
 my_IPaddress = get_my_IPaddress( config['interface'] )
 

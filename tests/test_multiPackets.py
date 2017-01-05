@@ -8,12 +8,29 @@ import requests
 import pytest
 import time
 
-config = {
-    "testID" : "Test case - Multi packets",\
-    "category" : "content",\
-    "lis-port" : 80,\
+config = {\
+    "test-id"   : "General test 1",\
     "interface" : "eth0",\
-    "parameter" :   [\
+    "tcp-port"  : 80,\
+    "configs"     : [\
+        {
+            "category"  : "time",
+            "parameters": [
+                {
+                    "state"     : "ESTABLISHED",
+                    "action"    : "sendAck",
+                    "delay"     : 1
+                },
+                {
+                    "state"     : "ESTABLISHED",
+                    "action"    : "send_response",
+                    "delay"     : 1
+                }
+            ]
+        },
+        {\
+            "category"  : "content",\
+            "parameters": [\
                 {\
                     "resource"    : "/",\
                     "http-status" : "HTTP/1.1 200 OK\r\n",\
@@ -39,9 +56,9 @@ config = {
                                         "headers"       : "Connection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
                                 }\
             ]\
-}
-
-
+        }\
+    ]\
+} 
 
 @pytest.fixture
 def makeRequestMultiPacket():
