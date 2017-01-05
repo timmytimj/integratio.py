@@ -45,6 +45,7 @@ confi = {
 my_IPaddress = get_my_IPaddress( confi['interface'] )
 
 def send( server_address = (my_IPaddress, 80) ):
+    time.sleep(0.5)
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.setsockopt( socket.IPPROTO_IP, IN.IP_RECVERR, 1 )
     sock.settimeout(7)
@@ -57,8 +58,10 @@ def send( server_address = (my_IPaddress, 80) ):
 def runConnector():
     con = Connector(confi, debug=3)
     con.runbg()
-    yield  con
-    con.stop()
+    return con
+#    yield  con
+#    con.stop()
+#    time.sleep(0.4)
 
 @pytest.fixture
 def runConnectorRefused():
@@ -67,8 +70,10 @@ def runConnectorRefused():
     confi['configs'][0]['parameters'][0]['flags'] = 'RPA'
     con = Connector(confi, debug=3)
     con.runbg()
-    yield  con
-    con.stop()
+    return con
+#    yield  con
+#    con.stop()
+#    time.sleep(0.4)
 
 @pytest.fixture
 def runConnectorEHOSTUNREACH():
@@ -79,8 +84,10 @@ def runConnectorEHOSTUNREACH():
     confi['configs'][0]['parameters'][0]['code'] = 1
     con = Connector(confi, debug=3)
     con.runbg()
-    yield  con
-    con.stop()
+    return con
+#    yield  con
+#    con.stop()
+#    time.sleep(0.4)
 
 @pytest.fixture
 def runConnectorENOPROTOOPT():
@@ -91,8 +98,10 @@ def runConnectorENOPROTOOPT():
     confi['configs'][0]['parameters'][0]['code'] = 2
     con = Connector(confi, debug=3)
     con.runbg()
-    yield  con
-    con.stop()
+    return con
+#    yield  con
+#    con.stop()
+#    time.sleep(0.4)
 
 @pytest.fixture
 def runConnectorECONNREFUSED():
@@ -103,8 +112,10 @@ def runConnectorECONNREFUSED():
     confi['configs'][0]['parameters'][0]['code'] = 3    
     con = Connector(confi, debug=3)
     con.runbg()
-    yield  con
-    con.stop()
+    return con
+#    yield  con
+#    con.stop()
+#    time.sleep(0.4)
 
 @pytest.fixture
 def runConnectorENOTSUP():
@@ -115,8 +126,10 @@ def runConnectorENOTSUP():
     confi['configs'][0]['parameters'][0]['code'] = 5
     con = Connector(confi, debug=3)
     con.runbg()
-    yield  con
-    con.stop()
+    return con
+#    yield  con
+#    con.stop()
+#    time.sleep(0.4)
 
 @pytest.fixture
 def runConnectorENETUNREACH():
@@ -127,8 +140,10 @@ def runConnectorENETUNREACH():
     confi['configs'][0]['parameters'][0]['code'] = 6
     con = Connector(confi, debug=3)
     con.runbg()
-    yield  con
-    con.stop()
+    return con
+#    yield  con
+#    con.stop()
+#    time.sleep(0.4)
 
 @pytest.fixture
 def runConnectorEHOSTDOWN():
@@ -139,8 +154,10 @@ def runConnectorEHOSTDOWN():
     confi['configs'][0]['parameters'][0]['code'] = 7
     con = Connector(confi, debug=3)
     con.runbg()
-    yield  con
-    con.stop()
+    return con
+#    yield  con
+#    con.stop()
+#    time.sleep(0.4)
 
 @pytest.fixture
 def runConnectorENONET():
@@ -151,8 +168,10 @@ def runConnectorENONET():
     confi['configs'][0]['parameters'][0]['code'] = 8
     con = Connector(confi, debug=3)
     con.runbg()
-    yield  con
-    con.stop()
+    return con
+#    yield  con
+#    con.stop()
+#    time.sleep(0.4)
 
 # TCZ
 
