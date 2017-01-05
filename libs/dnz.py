@@ -15,7 +15,7 @@ import fcntl
 import struct
 
 class DNZee(Automaton):
-    def parse_args(self, config={}, sport=53, **kargs):
+    def parse_args(self, sport=53, **kargs):
         # DEBUG 
         #print "[DEBUG] Starting processing parameters" 
         Automaton.parse_args(self, **kargs)
@@ -27,16 +27,12 @@ class DNZee(Automaton):
         # TODO  Keep track of last processed HTTP request, to 
         #   avoid problems with retransmission. Need to be refactored and cleaned up
         self.lastHttpRequest = ""
-        self.config=config
         self.DNS_lookup = {}
 
-        # Parsing the "dnz-conf" object type of json-schema to avoid
-        # parsing for every look-up
-        lookupDB = self.config['parameter']
-        for record in lookupDB:
-            key = record['q-addr']
-            value = record['response']
-            self.DNS_lookup[key]=value
+    def add_dnsLookUp(self, key, value):
+        print "[DEBUG] ADDED DNS KEY-VALUE PAIR %s:%s"%(key,value)
+        self.DNS_lookup[key]=value
+
         
     def master_filter(self, pkt):
         return  ( IP in pkt and UDP in pkt \

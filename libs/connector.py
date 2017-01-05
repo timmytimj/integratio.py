@@ -37,7 +37,28 @@ class Connector(Automaton):
             #                      on the content of the JSON paramters. I do not want to pass the 
             #                      full JSON to DNZee, we should have method calls to add entries to
             #                      DNZee internal list of "q-addr"/"response" pairs
+            print ">>>[remove] about to check the JSON" 
+            if 'configs' in self.config:
+                print ">>>[remove] configs is there, about to iterate"
+                for c in self.config['configs']:
+                    print ">>>[remove] there is at least one item in configs"
+                    # DNS category #
+                    if c['category'] == 'dns':
+                        dnz = DNZee(self.dnsPort, debug=3)
+                        print ">>>[remove] this item is a DNS category"
+                        # Parsing the "dnz-conf" object type of json-schema to avoid
+                        # parsing for every look-up
+                        lookupDB = c['parameters']
+                        for record in lookupDB:
+                            key = record['q-addr']
+                            value = record['response']
+                            dnz.add_dnsLookUp(key,value)
+                        dnzThread = Thread(target=dnz.run, name='DNS_Thread')
+                        dnzThread.daemon = True
 
+                        # Starting the TCZ Threads
+                        dnzThread.start()     
+                        
         # Legacy JSON format, keep it for the moment until 
         # migration to JSON-schema is completed
         if 'listeningInterface' in self.config:
