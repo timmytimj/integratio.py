@@ -1,0 +1,23 @@
+== Release 1 milestone (v0.1) ==
+
+Marco Zunino eng.marco.zunino@gmail.com - 05 January 2017
+https://bitbucket.org/zupino/integratio
+
+Main features
+
+- Simulation of Connection errors ('packet' category test cases, with 'tcz' and 'icmz' subcategory)
+- Simulated HTTP response ('content' category test cases)
+- DNS response (only good case, 'dns' test cases)
+- Support for delay test cases in different point of the TCP state machine ('time' category test cases)
+- It is possible to have one single test case configuration with mixed test category
+
+Known issues
+
+- Delay for HTTP response requires set up in 2 different point of state machine
+- Automated test cases are not always consistent if the whole test suite is executed
+- HTTP response spread on several chunks sometimes are not recollected in the proper order from the client
+- Scapy bug 364 prevent extensive usage of Automaton, after about 120 request, Err24 too many file opens error is triggered (see https://bitbucket.org/secdev/scapy/issues/364/automaton-leaves-too-many-open-file)
+- Inconsistent JSON configuration are currently allowed
+- No JSON validation applied
+- No delay or error cases supported for DNS, only OK case
+
