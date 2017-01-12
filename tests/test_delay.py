@@ -72,6 +72,7 @@ def connect_ex( time = 3, server_address = (my_IPaddress, 80) ):
 def runConnector():
     con = Connector(config, debug=3)
     con.runbg()
+    time.sleep(1)
     return  con
 
 # TCZ will wait 3 seconds before reply to SYN.

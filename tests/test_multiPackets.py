@@ -90,7 +90,6 @@ def makeRequestMultiPacket_1600():
     yield r.content
     con.stop()
 
-
 # test case to verify the multiple TCP segment response.
 # This test case get more than 11 kB of response
 def test_multiPackets_1(makeRequestMultiPacket):

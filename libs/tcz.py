@@ -141,7 +141,7 @@ class TCZee(Automaton):
         
         Automaton.parse_args(self, **kargs)
         self.pendingSend = False
- 
+        
         if (IP in pkt):
             self.setInitialPacket(pkt)
 
@@ -158,7 +158,7 @@ class TCZee(Automaton):
 
         # Keeping track of the last valid packet received
         self.lastReceived = ""
-
+        
         # IF a JSON configuration is available, we use it
         if jsonConfig != {}:
             self.jsonConf(jsonConfig)
@@ -212,8 +212,7 @@ class TCZee(Automaton):
     def send(self, pkt):
         curframe = inspect.currentframe()
         calframe = inspect.getouterframes(curframe, 1)
-        print "\t\t[NEW DEBUG] Action: ", calframe[1][3]+ "-- current Thread --" + (threading.current_thread().name) + ", ID -- "+ str(threading.current_thread().ident)+"\n"
-
+        print "\t\t[NEW DEBUG] Action: ", calframe[1][3]+ ", State: " + self.state.state + " -- current Thread -- " + (threading.current_thread().name) + ", ID -- "+ str(threading.current_thread().ident)+"\n"
         # Check for time tests
         fd = isTestRelevant(self.tDelays, self.state.state, calframe[1][3])
         fp = isTestRelevant(self.tPackets, self.state.state, calframe[1][3])
@@ -231,6 +230,15 @@ class TCZee(Automaton):
             pass
         
         super(TCZee, self).send(pkt)
+        
+        # [MZ 09.01.2017]   This is to close the TCZ Thread after a RST or ICMP Error is sent
+        #                   for the 'packet' category. I observed an error when setting a RST 
+        #                   confiuration and test Chrome, after several SYN sent from the client
+        #                   the configuration is ignored and a SA send instead of a RPA.
+        #                   This is not observable with 50 test in a row on PC, but after 15 round
+        #                   it is reproducible on RPi.
+        if isinstance(fp, confTCZ) or isinstance(fp, confICMZ):
+            raise self.END()
 
     # @ATMT.action(receive_pshAck)
     def send_response(self):
@@ -621,4 +629,7 @@ class TCZee(Automaton):
 
     @ATMT.state(final=1)
     def END(self):
-        self.stop()
+        # Adding the received load to the recv buffer
+        self.recv.put( "exit" )
+
+

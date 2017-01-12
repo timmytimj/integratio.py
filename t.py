@@ -5,6 +5,8 @@ from scapy.all import *
 import sys
 sys.path.append('.')
 from libs.connector import Connector
+import socket
+from libs.common import *
 
 log_interactive.setLevel(1)
 
@@ -13,21 +15,69 @@ jconfig = {\
     "interface" : "eth0",\
     "tcp-port"  : 80,\
     "configs"     : [\
-#        {
-#            "category"  : "time",
-#            "parameters": [
-#                {
-#                    "state"     : "ESTABLISHED",
-#                    "action"    : "sendAck",
-#                    "delay"     : 0.1
-#                },
-#                {
-#                    "state"     : "ESTABLISHED",
-#                    "action"    : "send_response",
-#                    "delay"     : 0.1
-#                }
-#            ]
-#        },
+        {\
+            "category"  : "content",\
+            "parameters": [\
+                {\
+                        "resource"  : "/",\
+                        "http-status" : "HTTP/1.1 200 OK\r\n",\
+                        "body"      : "Response for the main resource /",\
+                        "headers"   : "Connection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
+                },\
+                {\
+                        "resource"      : "/500",\
+                        "http-status"   : "HTTP/1.1 500 Internal Server error\r\n",\
+                        "body"          : "Response for the 500 error",\
+                        "headers"       : "Connection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
+                },\
+                {\
+                        "resource"      : "/404",\
+                        "body"          : "Response for the 404 error",\
+                        "http-status" : "HTTP/1.1 404 Resource Not Found\r\n",\
+                        "headers"       : "Connection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
+                },\
+                {\
+                        "resource"      : "/favicon.ico",\
+                        "http-status"   : "HTTP/1.1 200 OK\r\n",\
+                        "body"          : "FavICO",\
+                        "headers"       : "Connection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
+                }\
+            ]\
+        }\
+    ]\
+} 
+
+jjconfig = {\
+    "test-id"   : "General test 1",\
+    "interface" : "eth0",\
+    "tcp-port"  : 80,\
+    "configs"     : [\
+        {
+            "category"  : "packet",
+            "parameters":[
+                {
+                    "sub-category":"tcz",
+                    "state"     : "BEGIN",
+                    "action"    : "BEGIN",
+                    "flags"      : 'RP'
+                }
+            ]
+        },
+        {
+            "category"  : "time",
+            "parameters": [
+                {
+                    "state"     : "ESTABLISHED",
+                    "action"    : "sendAck",
+                    "delay"     : 0.1
+                },
+                {
+                    "state"     : "ESTABLISHED",
+                    "action"    : "send_response",
+                    "delay"     : 0.1
+                }
+            ]
+        },
         {\
             "category"  : "content",\
             "parameters": [\
@@ -60,32 +110,32 @@ jconfig = {\
     ]\
 } 
 
-
-jjconfig = {
-    "test-id"   : "General test 1",
-    "interface" : "eth0",
-    "tcp-port"  : 80,
-    "configs"     : [
-        {
-            "category"  : "packet",
-            "parameters": [
-                {
-                    "sub-category" : "icmz",
-                    "state"     : "ESTABLISHED",
-                    "action"    : "sendAck",
-                    "type"      : 3,
-                    "code"      : 8
-                }
-            ]
-        }
-    ]
-}
-
-c = Connector(jconfig, debug=3)
-c.run()
-
-
-print "\n\n\n======= 8< ======== Config file ======== 8< ==========\n"
-print json.dumps(jconfig, indent=2, sort_keys=False)
-print "\n========= 8< ======== END Config file ========== 8< ==========\n"
-
+if(len(sys.argv) > 1 and sys.argv[1] == "remote"):    
+    
+    cmd = ""
+    #c = Connector(jconfig, debug=4)
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind( (get_ip_address(jconfig['interface']), 6565) )
+    s.listen(1)
+    sc,caddr = s.accept()
+    
+    print "Connection accepted, ready for command"
+    while (s):
+        cmd = sc.recv(10)
+        print "Received data: " + str(cmd)
+        if cmd == "start\n":
+            c = Connector(jconfig, debug=3)
+            c.run()
+        elif cmd == "stop\n":
+            c.stop()
+            print "\n\n\n======= 8< ======== Config file ======== 8< ==========\n"
+            print json.dumps(jconfig, indent=2, sort_keys=False)
+            print "\n========= 8< ======== END Config file ========== 8< ==========\n"
+            s.close()
+            exit()
+else:
+    c = Connector(jconfig, debug=3)
+    c.run()
+    print "\n\n\n======= 8< ======== Config file ======== 8< ==========\n"
+    print json.dumps(jconfig, indent=2, sort_keys=False)
+    print "\n========= 8< ======== END Config file ========== 8< ==========\n"

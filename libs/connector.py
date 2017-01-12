@@ -128,12 +128,20 @@ class Connector(Automaton):
             else:
                 return False
 
-
+    def stop(self):
+        for i in self.connections:
+            i.stop()
+        #raise self.CON_END()
+        super(Connector, self).stop()
 
     # BEGIN state
     @ATMT.state(initial=1)
     def CON_BEGIN(self):
         raise self.CON_LISTEN()
+
+    @ATMT.state(final=1)
+    def CON_END(self):
+        pass
 
     @ATMT.state()
     def CON_LISTEN(self):

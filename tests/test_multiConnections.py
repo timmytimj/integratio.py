@@ -56,7 +56,7 @@ def makeRequestMultiConnections():
     # config = json.load(fileConfig)
     con = Connector(config, debug=3)
     con.runbg()
-
+    time.sleep(1)
     my_IPaddress = "http://%s" % (get_my_IPaddress('eth0'))
 
     # creating MULTIPLE requests

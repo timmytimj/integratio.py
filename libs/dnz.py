@@ -51,6 +51,15 @@ class DNZee(Automaton):
     def DNZ_LISTEN(self):
         pass
 
+    # END
+    @ATMT.state(final=1)
+    def DNZ_END(self):
+        pass
+
+    def stop(self):
+        raise self.DNZ_END()
+        super(DNZee, self).stop()
+
     @ATMT.receive_condition(DNZ_LISTEN)
     def check_query(self, pkt):
         # Checking if what I got has a DNS layer 

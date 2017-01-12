@@ -47,14 +47,12 @@ config = {\
     ]\
 } 
 
-
+my_IPaddress = "http://%s" % (get_my_IPaddress(config['interface']))
 
 @pytest.fixture
 def makeRequest500():
     con = Connector(config, debug=3)
     con.runbg()
-
-    my_IPaddress = "http://%s" % (get_my_IPaddress(config['interface']))
 
     r = requests.get(my_IPaddress + '/500', timeout=5)
     return r
@@ -67,8 +65,6 @@ def makeRequest404():
     con = Connector(config, debug=3)
     con.runbg()
 
-    my_IPaddress = "http://%s" % (get_my_IPaddress('eth0'))
-
     r = requests.get(my_IPaddress + '/404', timeout=5)
     return r
 #    yield r
@@ -80,13 +76,12 @@ def makeRequestFavico():
     con = Connector(config, debug=3)
     con.runbg()
 
-    my_IPaddress = "http://%s" % (get_my_IPaddress('eth0'))
-
     r = requests.get(my_IPaddress + '/favicon.ico', timeout=5)
-    return r.text
-#    yield r.text
-#    r.close()
-#    con.stop()
+    #return r.text
+    yield r.text
+    r.close()
+    con.stop()
+    time.sleep(1)
 
 
 def test_content_500(makeRequest500):
