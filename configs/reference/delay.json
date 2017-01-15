@@ -4,20 +4,25 @@
 */
 
 {
-	"test-id"  : "delay001",
-    "interface": "eth0",
-    "lis-port" : 80,
-    "category" : "time",
-    "parameter": [
-      	{
-    		"state" : "ESTABLISHED",
-        	"action": "sendAck",
-        	"delay" : 6
-    	},
+    "test-id"   : "General test 1",
+    "interface" : "eth0",
+    "tcp-port"  : 80,
+    "configs"     : [
         {
-    		"state" : "BEGIN",
-        	"action": "BEGIN",
-        	"delay" : 3
-    	}
+            /* TIME */
+            "category"  : "time",
+            "parameters": [
+                {
+                    "state"     : "ESTABLISHED",
+                    "action"    : "sendAck",
+                    "delay"     : 6
+                },
+                {
+                    "state"     : "CLOSING",
+                    "action"    : "CLOSING",
+                    "delay"     : 2
+                }
+            ]
+        }
     ]
 }

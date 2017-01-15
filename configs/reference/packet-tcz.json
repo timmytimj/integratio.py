@@ -4,16 +4,21 @@
 */
 
 {
-	"test-id"  : "p-tcz001",
-    "interface": "eth0",
-    "lis-port" : 80,
-    "category" : "packet",
-    "sub-category" : "tcz",
-    "parameter": [
-      	{
-    		"state" : "ESTABLISHED",
-        	"action": "sendAck",
-        	"flags" : "RA"
-    	}
+    "test-id"   : "General test 1",
+    "interface" : "eth0",
+    "tcp-port"  : 80,
+    "dns-port"  : 53,
+    "configs"     : [
+        {
+            "category"  : "packet",
+            "parameters": [
+                {
+                    "sub-category" : "tcz",
+                    "state"     : "CLOSING",
+                    "action"    : "CLOSING",
+                    "flags"     : "RA"
+                }
+            ]
+        }
     ]
 }

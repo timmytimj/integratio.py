@@ -4,18 +4,23 @@
 */
 
 {
-	"test-id"  : "dns001",
-    "interface": "eth0",
-    "lis-port" : 53,
-    "category" : "dns",
-    "parameter": [
-      	{
-    		"q-addr" : "www.google.com",
-        	"response": "192.168.178.60"
-    	},
+    "test-id"   : "DNS 1",
+    "interface" : "eth0",
+    "tcp-port"  : 80,
+    "dns-port"  : 53,
+    "configs"     : [
         {
-    		"q-addr" : "www.test.com",
-        	"response": "192.168.178.60"
-    	}
+            "category"  : "dns",
+            "parameters": [
+                {
+                    "q-addr" : "www.google.com",
+                    "response": "192.168.178.60"
+                },
+                {
+                    "q-addr" : "www.test.com",
+                    "response": "192.168.178.68"
+                }
+            ]
+        }
     ]
 }

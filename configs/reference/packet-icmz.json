@@ -4,17 +4,22 @@
 */
 
 {
-	"test-id"  : "p-icmz001",
-    "interface": "eth0",
-    "lis-port" : 80,
-    "category" : "packet",
-    "sub-category" : "icmz",
-    "parameter": [
-      	{
-    		"state" : "ESTABLISHED",
-        	"action": "sendAck",
-        	"type" : 3,
-          	"code" : 2
-    	}
+    "test-id"   : "General test 1",
+    "interface" : "eth0",
+    "tcp-port"  : 80,
+    "dns-port"  : 53,
+    "configs"     : [
+        {
+            "category"  : "packet",
+            "parameters": [
+                {
+                    "sub-category" : "icmz",
+                    "state"     : "ESTABLISHED",
+                    "action"    : "sendAck",
+                    "type"      : 3,
+                    "code"      : 2
+                }
+            ]
+        }
     ]
 }
