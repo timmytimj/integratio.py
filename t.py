@@ -133,6 +133,19 @@ if(len(sys.argv) > 1 and sys.argv[1] == "remote"):
             print "\n========= 8< ======== END Config file ========== 8< ==========\n"
             s.close()
             exit()
+
+elif (len(sys.argv) > 1 and sys.argv[1] != "remote"):
+    with open(sys.argv[1]) as data_file:
+        jconfig = json.load(data_file)
+
+    c = Connector(jconfig, debug=3)
+    c.run()
+    print "\n\n\n======= 8< ======== Config file ======== 8< ==========\n"
+    print json.dumps(jconfig, indent=2, sort_keys=False)
+    print "\n========= 8< ======== END Config file ========== 8< ==========\n"
+
+        
+
 else:
     c = Connector(jconfig, debug=3)
     c.run()
