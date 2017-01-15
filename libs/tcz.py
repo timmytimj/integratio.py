@@ -223,7 +223,7 @@ class TCZee(Automaton):
 
         if isinstance(fp, confTCZ): 
             print "[DEBUG][26.12.2016] Packet TCZ - Assigning flags"
-            pkt[TCP].flags = fp.flags
+            pkt[TCP].flags = str(fp.flags)
         elif isinstance(fp, confICMZ):
             pkt = IP(src=pkt[IP].src, dst=pkt[IP].dst)/ICMP(type=fp.typ, code=fp.code)/self.lastReceived[IP]
         else:

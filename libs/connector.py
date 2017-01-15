@@ -110,14 +110,14 @@ class Connector(Automaton):
     # This will be useful when we will implement different retransmission policies
     # for the moment we use to avoid increasing self.ack when we received a retransmitted packet
     def isRetransmit(self, pkt):
-        if (self.lastReceived == ""):
-            return False
-        
+
         if(Padding in pkt):
             pkt[Padding] = None
-        if(Padding in self.lastReceived):
+        if(self.lastReceived != "" and Padding in self.lastReceived):
             self.lastReceived[Padding] = None
 
+        if (self.lastReceived == ""):
+            return False
         else:
             if(
                 (self.lastReceived[TCP].ack == pkt[TCP].ack) and \
