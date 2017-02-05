@@ -12,7 +12,7 @@ log_interactive.setLevel(1)
 
 jconfig = {\
     "test-id"   : "General test 1",\
-    "interface" : "eth0",\
+    "interface" : "wlan0",\
     "tcp-port"  : 80,\
     "configs"     : [\
         {\
@@ -22,25 +22,25 @@ jconfig = {\
                         "resource"  : "/",\
                         "http-status" : "HTTP/1.1 200 OK\r\n",\
                         "body"      : "Response for the main resource /",\
-                        "headers"   : "Connection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
+                        "headers"   : "Date: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
                 },\
                 {\
                         "resource"      : "/500",\
                         "http-status"   : "HTTP/1.1 500 Internal Server error\r\n",\
                         "body"          : "Response for the 500 error",\
-                        "headers"       : "Connection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
+                        "headers"       : "Date: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
                 },\
                 {\
                         "resource"      : "/404",\
                         "body"          : "Response for the 404 error",\
                         "http-status" : "HTTP/1.1 404 Resource Not Found\r\n",\
-                        "headers"       : "Connection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
+                        "headers"       : "Date: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
                 },\
                 {\
                         "resource"      : "/favicon.ico",\
                         "http-status"   : "HTTP/1.1 200 OK\r\n",\
                         "body"          : "FavICO",\
-                        "headers"       : "Connection: close\r\nDate: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
+                        "headers"       : "Date: Sat, 27 Aug 2016 18:51:19 GMT\r\nServer: Apache/2.4.10 (Unix)\r\n"\
                 }\
             ]\
         }\
@@ -147,7 +147,7 @@ elif (len(sys.argv) > 1 and sys.argv[1] != "remote"):
         
 
 else:
-    c = Connector(jconfig, debug=3)
+    c = Connector(jconfig)
     c.run()
     print "\n\n\n======= 8< ======== Config file ======== 8< ==========\n"
     print json.dumps(jconfig, indent=2, sort_keys=False)

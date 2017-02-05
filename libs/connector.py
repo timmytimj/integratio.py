@@ -98,11 +98,13 @@ class Connector(Automaton):
         if (self.localAddr != 0):
             return  ( IP in pkt and TCP in pkt \
                     and pkt[IP].dst == self.localAddr \
-                    and pkt[TCP].dport == self.localPort
+                    and pkt[TCP].dport == self.localPort \
+                    and 'S' in flags(pkt[TCP].flags) 
                     )
         else:
             return  ( IP in pkt and TCP in pkt \
-                    and pkt[TCP].dport == self.localPort
+                    and pkt[TCP].dport == self.localPort \
+                    and 'S' in flags(pkt[TCP].flags)
                     )
     
     # This is a tool method used to recognized if 'pkt'

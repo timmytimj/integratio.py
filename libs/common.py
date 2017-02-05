@@ -24,7 +24,7 @@ def get_ip_address(ifname):
 #       This has been fixed by changing the iptable rule.
 #       Still would be interesting to understand how using PacketSocket
 #       the iptable rules did not apply.
-conf.L3socket = L3RawSocket
+#conf.L3socket = L3RawSocket
 
 # return a list of flag 'chars' given an int
 # (p[TCP].flags)

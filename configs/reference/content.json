@@ -1,11 +1,6 @@
-/*
-* Example of Content test configuration
-*
-*/
-
 {
     "test-id"   : "General test 1",
-    "interface" : "eth0",
+    "interface" : "wlan0",
     "tcp-port"  : 80,
     "configs"     : [
         {
